@@ -1,0 +1,73 @@
+{
+  "name": "astra-browser-electron",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check src/main.cjs && node --check src/preload.cjs && node --check src/renderer.js",
+    "package": "electron-packager . \"Astra Browser Electron\" --platform=darwin --arch=arm64 --out=dist --overwrite --extra-resource=tools --icon=assets/icons/astra.icns",
+    "package:win": "electron-packager . \"Astra Browser Electron\" --platform=win32 --arch=x64 --out=dist --overwrite --icon=assets/icons/astra.ico",
+    "package:linux": "electron-packager . \"Astra Browser Electron\" --platform=linux --arch=x64 --out=dist --overwrite --icon=assets/icons/astra.png",
+    "dist": "electron-builder --publish never",
+    "prepare:tools": "node scripts/prepare-tools.cjs"
+  },
+  "devDependencies": {
+    "@electron/packager": "latest",
+    "electron": "45.2.1",
+    "electron-builder": "^26.18.0"
+  },
+  "dependencies": {
+    "dompurify": "^3.4.17",
+    "marked": "^18.1.2"
+  },
+  "description": "Astra AI browser for macOS, Windows and Linux",
+  "author": {
+    "name": "bennix",
+    "email": "zpxu@fudan.edu.cn"
+  },
+  "license": "GPL-3.0-only",
+  "homepage": "https://github.com/bennix/AstraAIBrowserALL",
+  "build": {
+    "appId": "com.electron.astra-browser-electron",
+    "productName": "Astra Browser",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "src/**/*",
+      "assets/icons/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "tools",
+        "to": "tools"
+      }
+    ],
+    "mac": {
+      "icon": "assets/icons/astra.icns",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "icon": "assets/icons/astra.ico",
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    },
+    "linux": {
+      "icon": "assets/icons/astra.png",
+      "target": [
+        "deb",
+        "rpm"
+      ],
+      "category": "Network",
+      "maintainer": "bennix <zpxu@fudan.edu.cn>"
+    }
+  }
+}

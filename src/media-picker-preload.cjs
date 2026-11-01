@@ -1,0 +1,1 @@
+const {contextBridge,ipcRenderer}=require('electron');contextBridge.exposeInMainWorld('picker',{onData:callback=>ipcRenderer.once('media-picker-data',(_e,data)=>callback(data)),choose:index=>ipcRenderer.send('media-picker-choice',index)});
