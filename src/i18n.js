@@ -2,7 +2,7 @@
 fetch('i18n/ui.json').then(response=>response.json()).then(catalog=>{
  const byEnglish=new Map(Object.values(catalog).map(entry=>[entry.en,entry]));
  function translate(element){
-  if(element.closest('#tabs')||(element.closest('#history-list,#bookmarks-list')&&element.textContent.trim()!=='Remove')||(element.closest('#conversation')&&!element.matches('.copy-button,.markdown.waiting')))return;
+  if(element.closest('.dictionary-entry')||element.closest('#tabs')||(element.closest('#history-list,#bookmarks-list')&&element.textContent.trim()!=='Remove')||(element.closest('#conversation')&&!element.matches('.copy-button,.markdown.waiting')))return;
   const entry=element.dataset.i18n?catalog[element.dataset.i18n]:byEnglish.get(element.textContent.trim());
   if(entry&&!element.querySelector('input,select,textarea')){element.textContent=entry.zh;element.title=entry.en;}
   for(const attribute of ['placeholder','title','aria-label']){const text=element.getAttribute(attribute),copy=byEnglish.get(text);if(copy)element.setAttribute(attribute,copy.zh+' · '+copy.en);}

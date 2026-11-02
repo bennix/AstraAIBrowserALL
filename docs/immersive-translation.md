@@ -1,0 +1,17 @@
+# Immersive translation
+
+`translation.cjs` owns per-tab translation sessions, request cancellation, bounded batching, retry state and vocabulary storage. `translation-page.js` owns DOM collection and writeback. Both main and child frames use the existing `browser-frames.cjs` isolated-world adapter. ZenMux requests remain in `zenmux.cjs` and follow its existing networking and credential path.
+
+The toolbar menu starts, stops, retries or restores translation and selects an independent target language and display mode. Language changes take effect on the next start. Bilingual mode retains the original text nodes and links, adding marked text-only spans. Translation-only mode replaces text node values, retaining elements and event handlers; restore changes a node back only if its value still matches our replacement. Code blocks, editable fields and explicitly excluded content are not translated. Bilingual paragraph collection includes inline code and inline link text as context while preserving the original code and link nodes.
+
+A batch contains at most 16 segments or 6,000 characters, with up to four concurrent requests. Long passages are split without truncation and reassembled before paragraph writeback. Model responses must contain every requested identifier. A failed batch does not discard completed paragraphs. The retry action resubmits failed blocks; stop aborts in-flight requests and queued work. Navigation invalidates the session so stale replies cannot write into the next page.
+
+While active, the browser checks loaded frames for new, changed or replaced text every two seconds after the queue drains. Translation text is excluded from subsequent collection. Session caches are memory-only, bounded and discarded on restart or restore. Page text is sent to the configured ZenMux model only after the user starts translation. Newly loaded page content is included until stop or restore. API keys and page contents are not added to diagnostic logs.
+
+Limits: DOM text in loaded HTTP(S) frames is supported. Closed shadow roots, canvas-rendered text, text inside images, PDF rendering and off-screen content not yet loaded by the website are not covered. Websites that continually replace translated nodes may remove injected translations; the next scan attempts to recover without replacing the original element tree.
+
+## Selection vocabulary
+
+The page context menu captures the selection and its nearest readable original passage before opening the menu. Injected translations, scripts and form values are excluded. The selected word and bounded passage are sent through the existing ZenMux client for structured meaning, part of speech, contextual explanation and passage translation. The original passage and source URL are captured locally, never supplied by the model. Saving requires the Add to dictionary action in the result dialog.
+
+Vocabulary entries remain in the existing user-data vocabulary JSON file. Legacy word/translation entries are readable without rewriting the file. Entries are distinguished by word, source URL and original context; saving the same occurrence updates it while preserving its creation time. Writes replace the file atomically. Settings and the toolbar provide a user dictionary entry. Native save dialogs export a versioned JSON document or readable Markdown; exports include every stored context field and stay local unless the user shares them.

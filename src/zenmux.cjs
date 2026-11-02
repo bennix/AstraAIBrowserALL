@@ -1,8 +1,11 @@
 const {safeStorage,net}=require('electron');
 const fs=require('node:fs');
 // A live stream may run longer than the initial response deadline.
-async function completionRequest(key, payload, consume) {
+async function completionRequest(key, payload, consume, signal) {
  const controller = new AbortController();
+ const cancel = () => controller.abort();
+ if (signal?.aborted) controller.abort();
+ signal?.addEventListener('abort', cancel, {once:true});
  let timer;
  const refresh = () => {
   clearTimeout(timer);
@@ -18,12 +21,14 @@ async function completionRequest(key, payload, consume) {
   refresh();
   return await consume(response, refresh);
  } catch (error) {
+  if (signal?.aborted) throw error;
   if (controller.signal.aborted || error.name === 'TimeoutError') {
    throw Error('ZenMux did not respond for 3 minutes. Existing output has been preserved. Check the network or proxy, then send again.');
   }
   throw error;
  } finally {
   clearTimeout(timer);
+  signal?.removeEventListener('abort', cancel);
  }
 }
 module.exports={
@@ -43,7 +48,7 @@ module.exports={
  async validateModel(file,model){if(!fs.existsSync(file))throw Error('Configure a ZenMux API key first');const key=safeStorage.decryptString(fs.readFileSync(file));const response=await net.fetch('https://zenmux.ai/api/v1/models',{headers:{Authorization:'Bearer '+key},signal:AbortSignal.timeout(30000)});if(!response.ok)throw Error('Could not validate model (HTTP '+response.status+')');const catalog=await response.json();if(!catalog.data?.some(entry=>entry.id===model))throw Error('Model ID is not in the ZenMux catalog: '+model+'. Copy the exact provider/model ID.');return true;},
 
  saveKey(file,key){if(!safeStorage.isEncryptionAvailable())throw Error('System credential encryption is unavailable');fs.writeFileSync(file,safeStorage.encryptString(key),{mode:0o600});},
- async chat(file,model,messages,onDelta){
+ async chat(file,model,messages,onDelta,signal){
   if(!fs.existsSync(file))throw Error('Configure a ZenMux API key first');
   const key=safeStorage.decryptString(fs.readFileSync(file));
   return completionRequest(key,{model,messages,stream:!!onDelta},async(response,activity)=>{
@@ -51,6 +56,6 @@ module.exports={
    if(onDelta)return require('./stream.cjs')(response.body,onDelta,false,activity);
    const data=await response.json();const text=data.choices?.[0]?.message?.content;
    if(typeof text!=='string'||!text.trim())throw Error('ZenMux returned no text response');return text;
-  });
+  },signal);
  }
 };

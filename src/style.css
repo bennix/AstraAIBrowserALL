@@ -37,3 +37,7 @@ header button:disabled{opacity:.35;cursor:default;background:transparent}
 #bookmarks-list{max-height:260px;overflow:auto;margin:12px 0}#bookmark-toggle{font-size:20px;color:#4389b0}
 
 #open-external-app{font-size:12px;padding:6px;color:#4389b0}#open-external-app[hidden]{display:none}
+
+#translation-menu{font-size:12px;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#translation-language,#translation-mode{display:block;margin:8px 0}
+
+#dictionary-open{font-size:12px;white-space:nowrap}.dictionary-entry{border:1px solid #dfe1e6;border-radius:10px;padding:12px;margin:12px 0;background:white}.dictionary-entry h3{margin:0 0 8px}.dictionary-entry p{white-space:pre-wrap;overflow-wrap:anywhere;margin:6px 0}.dictionary-entry strong{color:#53718b}

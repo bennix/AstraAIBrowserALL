@@ -433,5 +433,220 @@
     "en": "OK",
     "zh": "好",
     "comment": "Dismiss external launch failure guidance"
+  },
+  "translation.start": {
+    "en": "Translate page",
+    "zh": "沉浸式翻译",
+    "comment": "Toolbar and page menu action to start translating the current page"
+  },
+  "translation.selection": {
+    "en": "Explain selection / Add to user dictionary",
+    "zh": "划词释义／加入用户字典",
+    "comment": "Right-click action to explain selected text with its original context and save it"
+  },
+  "translation.stop": {
+    "en": "Stop translation",
+    "zh": "停止翻译",
+    "comment": "Stops queued and active translation requests without removing completed text"
+  },
+  "translation.restore": {
+    "en": "Restore original",
+    "zh": "恢复原文",
+    "comment": "Removes translations and stops automatic translation for the page"
+  },
+  "translation.retry": {
+    "en": "Retry failed blocks",
+    "zh": "重试失败段落",
+    "comment": "Retries failed translation requests while preserving completed blocks"
+  },
+  "translation.language": {
+    "en": "Translation language",
+    "zh": "翻译目标语言",
+    "comment": "Target language independent from browser and website language"
+  },
+  "translation.mode": {
+    "en": "Display mode",
+    "zh": "译文显示方式",
+    "comment": "Controls bilingual or translated-only page presentation"
+  },
+  "translation.bilingual": {
+    "en": "Original + translation",
+    "zh": "原文＋译文",
+    "comment": "Keeps original page content and adds translated paragraphs"
+  },
+  "translation.translated": {
+    "en": "Translation only",
+    "zh": "仅显示译文",
+    "comment": "Replaces text nodes while preserving interactive elements"
+  },
+  "translation.failed": {
+    "en": "Translation failed",
+    "zh": "翻译失败",
+    "comment": "Title and status for a failed translation request"
+  },
+  "translation.invalidResponse": {
+    "en": "The model returned an incomplete translation. Retry failed blocks.",
+    "zh": "模型返回的译文不完整，请重试失败段落。",
+    "comment": "Error when the model omits or duplicates requested segment identifiers"
+  },
+  "translation.missingModel": {
+    "en": "Save a ZenMux model and API key in AI settings first.",
+    "zh": "请先在 AI 设置中保存 ZenMux 模型和 API KEY。",
+    "comment": "Error shown before translation when a model is missing"
+  },
+  "translation.selectionLength": {
+    "en": "Select between 1 and 6,000 characters.",
+    "zh": "请选择 1 至 6000 个字符。",
+    "comment": "Error shown when selected text is empty or too long"
+  },
+  "translation.close": {
+    "en": "Close",
+    "zh": "关闭",
+    "comment": "Closes the selection translation result"
+  },
+  "translation.addWord": {
+    "en": "Add to dictionary",
+    "zh": "加入字典",
+    "comment": "Saves selected text and translation in the vocabulary list"
+  },
+  "translation.unsupported": {
+    "en": "Only HTTP and HTTPS webpages can be translated.",
+    "zh": "只能翻译 HTTP 和 HTTPS 网页。",
+    "comment": "Error shown for unsupported internal pages"
+  },
+  "translation.invalidOptions": {
+    "en": "Choose a supported translation language and display mode.",
+    "zh": "请选择支持的翻译语言和显示方式。",
+    "comment": "Error shown for invalid translation options"
+  },
+  "translation.watching": {
+    "en": "Translated {completed} blocks · watching for new content",
+    "zh": "已翻译 {completed} 段 · 自动翻译新增内容",
+    "comment": "Idle translation status; completed is the number of applied paragraphs"
+  },
+  "translation.translating": {
+    "en": "Translating {completed}/{discovered}",
+    "zh": "翻译中 {completed}/{discovered}",
+    "comment": "Progress status; counts refer to discovered paragraphs"
+  },
+  "translation.stopped": {
+    "en": "Stopped · {completed} blocks translated",
+    "zh": "已停止 · 已翻译 {completed} 段",
+    "comment": "Status after user stops translation"
+  },
+  "translation.failedStatus": {
+    "en": "{completed} translated · {failed} failed",
+    "zh": "已翻译 {completed} 段 · {failed} 段失败",
+    "comment": "Partial failure status with completed and failed paragraph counts"
+  },
+  "translation.save": {
+    "en": "Save translation preferences",
+    "zh": "保存翻译偏好",
+    "comment": "Saves independent translation language and display mode"
+  },
+  "translation.description": {
+    "en": "Translate paragraphs without rebuilding the page. Newly loaded text is translated until stopped. Page text is sent to your configured ZenMux model.",
+    "zh": "按段落翻译，不重建网页。停止前会继续翻译新加载的文字。网页文字将发送给你配置的 ZenMux 模型。",
+    "comment": "Explains dynamic translation behavior and page text transmission"
+  },
+  "dictionary.title": {
+    "en": "User dictionary",
+    "zh": "用户字典",
+    "comment": "Settings section and toolbar entry for saved vocabulary"
+  },
+  "dictionary.word": {
+    "en": "Word / phrase",
+    "zh": "词／短语",
+    "comment": "Label for selected text in a dictionary entry"
+  },
+  "dictionary.meaning": {
+    "en": "Meaning",
+    "zh": "词义",
+    "comment": "Short translation of the selected word"
+  },
+  "dictionary.partOfSpeech": {
+    "en": "Part of speech",
+    "zh": "词性",
+    "comment": "Grammatical category of the selected word in context"
+  },
+  "dictionary.definition": {
+    "en": "Explanation",
+    "zh": "解释",
+    "comment": "Contextual definition in the target language"
+  },
+  "dictionary.original": {
+    "en": "Original context",
+    "zh": "原文上下文",
+    "comment": "Original webpage sentence or paragraph containing the word"
+  },
+  "dictionary.contextTranslation": {
+    "en": "Context translation",
+    "zh": "原文翻译",
+    "comment": "Translation of the surrounding original passage"
+  },
+  "dictionary.source": {
+    "en": "Source",
+    "zh": "来源",
+    "comment": "Source webpage URL and title of a saved word"
+  },
+  "dictionary.export": {
+    "en": "Export user dictionary",
+    "zh": "导出用户字典",
+    "comment": "Save dialog title for dictionary export"
+  },
+  "dictionary.exportJson": {
+    "en": "Export JSON",
+    "zh": "导出 JSON",
+    "comment": "Export complete dictionary entries in structured JSON"
+  },
+  "dictionary.exportMarkdown": {
+    "en": "Export Markdown",
+    "zh": "导出 Markdown",
+    "comment": "Export dictionary entries as a readable Markdown file"
+  },
+  "dictionary.invalidFormat": {
+    "en": "Choose JSON or Markdown.",
+    "zh": "请选择 JSON 或 Markdown 格式。",
+    "comment": "Error for an unsupported dictionary export format"
+  },
+  "dictionary.empty": {
+    "en": "No saved entries. Select website text, right-click, then choose Translate selection / Add to dictionary.",
+    "zh": "暂无词条。选中网页词语后点击右键，选择划词释义／加入用户字典。",
+    "comment": "Empty dictionary instructions explaining the context menu entry"
+  },
+  "dictionary.refresh": {
+    "en": "Refresh dictionary",
+    "zh": "刷新字典",
+    "comment": "Refreshes saved entries in settings"
+  },
+  "dictionary.exported": {
+    "en": "Exported {count} entries to {path}",
+    "zh": "已导出 {count} 个词条至 {path}",
+    "comment": "Export success; count is entry count and path is the user-selected file"
+  },
+  "dictionary.cancelled": {
+    "en": "Export cancelled",
+    "zh": "已取消导出",
+    "comment": "Shown when the save dialog is cancelled"
+  },
+  "dictionary.count": {
+    "en": "{count} saved entries",
+    "zh": "已保存 {count} 个词条",
+    "comment": "Dictionary entry count in settings"
+  },
+  "dictionary.savedAt": {
+    "en": "Saved at",
+    "zh": "保存时间",
+    "comment": "Creation time of a dictionary entry"
+  },
+  "dictionary.generated": {
+    "en": "AI explanations may be inaccurate; verify important terms.",
+    "zh": "AI 释义可能不准确，请核对重要术语。",
+    "comment": "Explains the source and limitations of generated definitions"
+  },
+  "translation.toolbar": {
+    "en": "Translate · {status}",
+    "zh": "翻译 · {status}",
+    "comment": "Persistent translation toolbar label with current status"
   }
 }
