@@ -388,5 +388,50 @@
     "en": "Clear website data",
     "zh": "清除网站数据",
     "comment": "Confirm website storage deletion"
+  },
+  "external.appStore.name": {
+    "en": "App Store",
+    "zh": "App Store",
+    "comment": "macOS store application name"
+  },
+  "external.meeting.name": {
+    "en": "Tencent Meeting",
+    "zh": "腾讯会议",
+    "comment": "Meeting client name in external launch confirmation"
+  },
+  "external.appStore.open": {
+    "en": "Open App Store",
+    "zh": "在 App Store 中打开",
+    "comment": "Address toolbar button for Apple app listing pages"
+  },
+  "external.open.confirm": {
+    "en": "Open {app}?",
+    "zh": "打开 {app}？",
+    "comment": "External application confirmation; app is the known application name"
+  },
+  "external.open.detail": {
+    "en": "This link opens another application. Meeting links may join a meeting. The application uses its own network and privacy settings. Source website:",
+    "zh": "此链接将打开其他应用，会议链接可能直接加入会议。外部应用使用自己的网络和隐私设置。来源网站：",
+    "comment": "External application handoff consequences and source origin"
+  },
+  "external.open.button": {
+    "en": "Open application",
+    "zh": "打开应用",
+    "comment": "Confirm an external application launch"
+  },
+  "external.open.failed": {
+    "en": "The application could not be opened",
+    "zh": "无法打开应用",
+    "comment": "No registered handler or external launch failure"
+  },
+  "external.open.install": {
+    "en": "Check that the application is installed and registered for this link type. You can keep using the webpage.",
+    "zh": "请确认客户端已安装，并已注册此类链接。网页会保留，可继续使用网页。",
+    "comment": "Recovery guidance after an external launch failure"
+  },
+  "external.open.ok": {
+    "en": "OK",
+    "zh": "好",
+    "comment": "Dismiss external launch failure guidance"
   }
 }
