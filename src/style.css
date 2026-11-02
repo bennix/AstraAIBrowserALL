@@ -33,3 +33,5 @@ body.tabs-closed aside{display:none}body.tabs-closed header{margin-left:0;paddin
 header button:disabled{opacity:.35;cursor:default;background:transparent}
 
 #history-list{max-height:260px;overflow:auto;margin:12px 0}.history-entry{display:flex;align-items:center;gap:12px;border-bottom:1px solid #eee}.history-entry button{flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.history-entry small{color:#617385}
+
+#bookmarks-list{max-height:260px;overflow:auto;margin:12px 0}#bookmark-toggle{font-size:20px;color:#4389b0}

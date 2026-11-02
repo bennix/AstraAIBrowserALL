@@ -11,3 +11,5 @@ Do Not Track and Global Privacy Control express a preference; websites may ignor
 Browsing history is local, capped at 1,000 entries. The History menu opens the latest 100 entries. History deletion also clears tab navigation stacks. Cookie/site-data deletion clears the browsing session's storage/cache after confirmation, retaining app settings and the encrypted AI key. Clearing local history is not a secure disk wipe.
 
 External DNS validation on the macOS development build: BrowserLeaks reported six Cloudflare resolvers, one ISP (Cloudflare), and one location. This is an observation for the tested network, not a guarantee for every proxy configuration.
+
+Bookmarks are stored locally and support explicit addition/removal through the star button, Cmd/Ctrl+D and the Bookmarks menu.
