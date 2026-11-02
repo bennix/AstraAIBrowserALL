@@ -1,7 +1,7 @@
 const {contextBridge}=require('electron');
-// Restrict common fingerprint reads before page scripts; official Claude verification uses a compatibility exception.
+// Restrict common fingerprint reads before page scripts; official AI and sign-in sites use narrow compatibility exceptions.
 if(process.argv.includes('--astra-strict-privacy'))contextBridge.executeInMainWorld({func:()=>{ const host=location.hostname;
- if(host==='claude.ai'||host.endsWith('.claude.ai')||host==='anthropic.com'||host.endsWith('.anthropic.com')||host==='challenges.cloudflare.com')return;
+ if(host==='claude.ai'||host.endsWith('.claude.ai')||host==='anthropic.com'||host.endsWith('.anthropic.com')||host==='challenges.cloudflare.com'||host==='gemini.google.com'||host==='accounts.google.com')return;
  const denied=()=>{throw new DOMException('Blocked by strict fingerprint protection','NotAllowedError');};
  const replace=(target,name,value)=>{if(!target)return;try{Object.defineProperty(target,name,{value,writable:false,configurable:false});}catch{}};
  for(const type of [globalThis.HTMLCanvasElement,globalThis.OffscreenCanvas]){const original=type?.prototype.getContext;if(original)replace(type.prototype,'getContext',function(kind,...args){if(/webgl|webgpu/i.test(String(kind)))return null;return original.call(this,kind,...args);});}

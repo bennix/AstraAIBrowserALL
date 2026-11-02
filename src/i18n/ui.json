@@ -1,0 +1,392 @@
+{
+  "browser.tabs.new": {
+    "en": "＋ New tab",
+    "zh": "＋ 新建标签页",
+    "comment": "Browser interface: browser.tabs.new"
+  },
+  "browser.settings.open": {
+    "en": "⚙ Settings",
+    "zh": "⚙ 设置",
+    "comment": "Browser interface: browser.settings.open"
+  },
+  "browser.toolbar.downloads": {
+    "en": "Downloads",
+    "zh": "下载",
+    "comment": "Browser interface: browser.toolbar.downloads"
+  },
+  "browser.ai.title": {
+    "en": "✦ Astra AI",
+    "zh": "✦ Astra AI 助手",
+    "comment": "Browser interface: browser.ai.title"
+  },
+  "browser.ai.copyConversation": {
+    "en": "Copy conversation",
+    "zh": "复制对话",
+    "comment": "Browser interface: browser.ai.copyConversation"
+  },
+  "browser.ai.tools": {
+    "en": "Model & video tools",
+    "zh": "模型与视频工具",
+    "comment": "Browser interface: browser.ai.tools"
+  },
+  "browser.ai.saveModel": {
+    "en": "Save model",
+    "zh": "保存模型",
+    "comment": "Browser interface: browser.ai.saveModel"
+  },
+  "browser.ai.testModel": {
+    "en": "Test model",
+    "zh": "测试模型",
+    "comment": "Browser interface: browser.ai.testModel"
+  },
+  "browser.ai.summarizeVideo": {
+    "en": "Summarize video · 8 sampled frames",
+    "zh": "总结视频 · 抽取 8 帧",
+    "comment": "Browser interface: browser.ai.summarizeVideo"
+  },
+  "browser.ai.prompt": {
+    "en": "Ask Astra",
+    "zh": "询问 Astra",
+    "comment": "Browser interface: browser.ai.prompt"
+  },
+  "browser.ai.files": {
+    "en": "＋ Files",
+    "zh": "＋ 附件",
+    "comment": "Browser interface: browser.ai.files"
+  },
+  "browser.ai.screenshot": {
+    "en": "Screenshot",
+    "zh": "网页截图",
+    "comment": "Browser interface: browser.ai.screenshot"
+  },
+  "browser.ai.copyPrompt": {
+    "en": "Copy prompt",
+    "zh": "复制提问",
+    "comment": "Browser interface: browser.ai.copyPrompt"
+  },
+  "browser.ai.copyAnswer": {
+    "en": "Copy answer",
+    "zh": "复制回答",
+    "comment": "Browser interface: browser.ai.copyAnswer"
+  },
+  "browser.ai.copied": {
+    "en": "Copied",
+    "zh": "已复制",
+    "comment": "Browser interface: browser.ai.copied"
+  },
+  "browser.ai.send": {
+    "en": "Send",
+    "zh": "发送",
+    "comment": "Browser interface: browser.ai.send"
+  },
+  "browser.ai.context": {
+    "en": "Page context",
+    "zh": "包含网页内容",
+    "comment": "Browser interface: browser.ai.context"
+  },
+  "browser.ai.control": {
+    "en": "Browser control",
+    "zh": "操控网页",
+    "comment": "Browser interface: browser.ai.control"
+  },
+  "browser.ai.confirm": {
+    "en": "I confirm the task is complete",
+    "zh": "我确认任务已完成",
+    "comment": "Browser interface: browser.ai.confirm"
+  },
+  "browser.ai.continue": {
+    "en": "Continue execution",
+    "zh": "继续执行",
+    "comment": "Browser interface: browser.ai.continue"
+  },
+  "browser.ai.stop": {
+    "en": "Stop browser control",
+    "zh": "停止操控",
+    "comment": "Browser interface: browser.ai.stop"
+  },
+  "browser.ai.actions": {
+    "en": "Browser actions",
+    "zh": "操作记录",
+    "comment": "Browser interface: browser.ai.actions"
+  },
+  "browser.ai.wait": {
+    "en": "Waiting for the model…",
+    "zh": "正在等待模型响应…",
+    "comment": "Browser interface: browser.ai.wait"
+  },
+  "settings.title": {
+    "en": "Settings",
+    "zh": "设置",
+    "comment": "Browser interface: settings.title"
+  },
+  "settings.bookmarks.title": {
+    "en": "Bookmarks",
+    "zh": "书签",
+    "comment": "Browser interface: settings.bookmarks.title"
+  },
+  "settings.bookmarks.view": {
+    "en": "View bookmarks",
+    "zh": "查看书签",
+    "comment": "Browser interface: settings.bookmarks.view"
+  },
+  "settings.data.title": {
+    "en": "History & website data",
+    "zh": "历史记录与网站数据",
+    "comment": "Browser interface: settings.data.title"
+  },
+  "settings.history.view": {
+    "en": "View history",
+    "zh": "查看历史记录",
+    "comment": "Browser interface: settings.history.view"
+  },
+  "settings.history.clear": {
+    "en": "Clear history",
+    "zh": "清除历史记录",
+    "comment": "Browser interface: settings.history.clear"
+  },
+  "settings.data.clear": {
+    "en": "Clear cookies & website data",
+    "zh": "清除 Cookie 与网站数据",
+    "comment": "Browser interface: settings.data.clear"
+  },
+  "settings.privacy.title": {
+    "en": "Privacy",
+    "zh": "隐私保护",
+    "comment": "Browser interface: settings.privacy.title"
+  },
+  "settings.privacy.dnt": {
+    "en": "Send Do Not Track and Global Privacy Control signals",
+    "zh": "发送“不要跟踪”和 GPC 隐私信号",
+    "comment": "Browser interface: settings.privacy.dnt"
+  },
+  "settings.privacy.strict": {
+    "en": "Strict fingerprint protection (restart required)",
+    "zh": "严格指纹保护（重启生效）",
+    "comment": "Browser interface: settings.privacy.strict"
+  },
+  "settings.privacy.dns": {
+    "en": "Secure DNS via Cloudflare (DoH, no plaintext fallback)",
+    "zh": "Cloudflare 安全 DNS（DoH，不回退明文 DNS）",
+    "comment": "Browser interface: settings.privacy.dns"
+  },
+  "settings.privacy.save": {
+    "en": "Apply privacy settings",
+    "zh": "应用隐私设置",
+    "comment": "Browser interface: settings.privacy.save"
+  },
+  "settings.proxy.title": {
+    "en": "Network proxy",
+    "zh": "网络代理",
+    "comment": "Browser interface: settings.proxy.title"
+  },
+  "settings.proxy.system": {
+    "en": "Automatic — follow macOS proxy settings",
+    "zh": "自动 — 跟随系统代理设置",
+    "comment": "Browser interface: settings.proxy.system"
+  },
+  "settings.proxy.manual": {
+    "en": "Manual proxy",
+    "zh": "手动代理",
+    "comment": "Browser interface: settings.proxy.manual"
+  },
+  "settings.proxy.direct": {
+    "en": "Direct connection",
+    "zh": "直接连接",
+    "comment": "Browser interface: settings.proxy.direct"
+  },
+  "settings.proxy.apply": {
+    "en": "Apply proxy",
+    "zh": "应用代理",
+    "comment": "Browser interface: settings.proxy.apply"
+  },
+  "settings.proxy.detect": {
+    "en": "Detect current proxy",
+    "zh": "检测当前代理",
+    "comment": "Browser interface: settings.proxy.detect"
+  },
+  "settings.dictionary.view": {
+    "en": "Dictionary",
+    "zh": "词典",
+    "comment": "Browser interface: settings.dictionary.view"
+  },
+  "settings.ai.title": {
+    "en": "ZenMux AI",
+    "zh": "ZenMux AI 设置",
+    "comment": "Browser interface: settings.ai.title"
+  },
+  "settings.ai.saveKey": {
+    "en": "Save API key",
+    "zh": "保存 API 密钥",
+    "comment": "Browser interface: settings.ai.saveKey"
+  },
+  "settings.ai.testKey": {
+    "en": "Test API key",
+    "zh": "测试 API 密钥",
+    "comment": "Browser interface: settings.ai.testKey"
+  },
+  "settings.ai.getKey": {
+    "en": "Get a ZenMux API key",
+    "zh": "获取 ZenMux API 密钥",
+    "comment": "Browser interface: settings.ai.getKey"
+  },
+  "settings.locale.websiteLanguage": {
+    "en": "Website language",
+    "zh": "网站语言（与界面语言独立）",
+    "comment": "Browser interface: settings.locale.websiteLanguage"
+  },
+  "settings.locale.timezone": {
+    "en": "Website timezone",
+    "zh": "网页时区",
+    "comment": "Browser interface: settings.locale.timezone"
+  },
+  "settings.locale.bilingual": {
+    "en": "Website languages: Chinese first, English second",
+    "zh": "网站语言：中文优先、英语其次",
+    "comment": "Browser interface: settings.locale.bilingual"
+  },
+  "settings.locale.system": {
+    "en": "System default",
+    "zh": "跟随系统",
+    "comment": "Browser interface: settings.locale.system"
+  },
+  "settings.save": {
+    "en": "Save settings",
+    "zh": "保存设置",
+    "comment": "Browser interface: settings.save"
+  },
+  "browser.items.remove": {
+    "en": "Remove",
+    "zh": "删除",
+    "comment": "Browser interface: browser.items.remove"
+  },
+  "browser.history.empty": {
+    "en": "No browsing history.",
+    "zh": "暂无历史记录",
+    "comment": "Browser interface: browser.history.empty"
+  },
+  "browser.bookmarks.empty": {
+    "en": "No bookmarks yet. Use the star beside the address bar.",
+    "zh": "暂无书签，点击地址栏旁的星标即可添加",
+    "comment": "Browser interface: browser.bookmarks.empty"
+  },
+  "menu.history.title": {
+    "en": "History",
+    "zh": "历史记录",
+    "comment": "Browser interface: menu.history.title"
+  },
+  "menu.history.show": {
+    "en": "Show History",
+    "zh": "查看历史记录",
+    "comment": "Browser interface: menu.history.show"
+  },
+  "menu.bookmarks.title": {
+    "en": "Bookmarks",
+    "zh": "书签",
+    "comment": "Browser interface: menu.bookmarks.title"
+  },
+  "menu.bookmarks.add": {
+    "en": "Bookmark This Tab",
+    "zh": "收藏当前网页",
+    "comment": "Browser interface: menu.bookmarks.add"
+  },
+  "menu.bookmarks.show": {
+    "en": "Show Bookmarks",
+    "zh": "查看书签",
+    "comment": "Browser interface: menu.bookmarks.show"
+  },
+  "menu.view.title": {
+    "en": "View",
+    "zh": "视图",
+    "comment": "Browser interface: menu.view.title"
+  },
+  "menu.view.reload": {
+    "en": "Reload page",
+    "zh": "刷新网页",
+    "comment": "Browser interface: menu.view.reload"
+  },
+  "menu.view.inspect": {
+    "en": "Inspect current page",
+    "zh": "检查当前网页",
+    "comment": "Browser interface: menu.view.inspect"
+  },
+  "browser.navigation.back": {
+    "en": "Back",
+    "zh": "后退",
+    "comment": "Browser interface: browser.navigation.back"
+  },
+  "browser.navigation.noBack": {
+    "en": "No previous page in this tab",
+    "zh": "此标签页没有可后退的页面",
+    "comment": "Browser interface: browser.navigation.noBack"
+  },
+  "browser.navigation.forward": {
+    "en": "Forward",
+    "zh": "前进",
+    "comment": "Browser interface: browser.navigation.forward"
+  },
+  "browser.navigation.noForward": {
+    "en": "No next page in this tab",
+    "zh": "此标签页没有可前进的页面",
+    "comment": "Browser interface: browser.navigation.noForward"
+  },
+  "browser.bookmark.add": {
+    "en": "Bookmark this page",
+    "zh": "收藏此网页",
+    "comment": "Browser interface: browser.bookmark.add"
+  },
+  "browser.bookmark.remove": {
+    "en": "Remove bookmark",
+    "zh": "取消收藏",
+    "comment": "Browser interface: browser.bookmark.remove"
+  },
+  "settings.locale.reload": {
+    "en": "Reload a website to apply its new language. Website account settings may override browser preferences.",
+    "zh": "保存后刷新网页以应用新配置。网站账号设置可能覆盖浏览器的语言偏好。",
+    "comment": "Browser interface: settings.locale.reload"
+  },
+  "settings.privacy.description": {
+    "en": "Restricts common document-level canvas, WebGL, audio and font fingerprint reads. Worker and cross-frame fingerprint resistance is not guaranteed. Some sites may not work. Claude, Anthropic, Gemini, Google sign-in and challenges.cloudflare.com use compatibility exceptions for verification. Network privacy protections remain active. It does not hide your account, cookies, IP address or every possible fingerprint.",
+    "zh": "限制常见网页 Canvas、WebGL、音频和字体指纹读取；不保证覆盖 Worker 和跨框架读取，部分网站可能受限。Claude、Anthropic、Gemini、Google 登录和官方 Cloudflare 验证域名使用兼容例外，网络防护仍开启。账号、Cookie、出口 IP 和其他指纹仍可能识别用户。",
+    "comment": "Browser interface: settings.privacy.description"
+  },
+  "settings.privacy.dnsDescription": {
+    "en": "When Chromium resolves a hostname it uses encrypted DNS. Website names are resolved through DoH before proxy tunneling. Proxy-side traffic inspection or DNS rules may still affect observed results. Cloudflare receives DNS queries. If DoH is unreachable, name resolution may fail.",
+    "zh": "浏览器先通过加密 DoH 解析域名，再建立代理隧道。代理端流量嗅探或规则仍可能影响结果。Cloudflare 会接收 DNS 查询；DoH 不可用时解析会失败。",
+    "comment": "Browser interface: settings.privacy.dnsDescription"
+  },
+  "browser.address.placeholder": {
+    "en": "Search or enter address",
+    "zh": "搜索或输入网址",
+    "comment": "Address bar input placeholder"
+  },
+  "settings.ai.keyPlaceholder": {
+    "en": "ZenMux API key",
+    "zh": "ZenMux API 密钥",
+    "comment": "AI credential input placeholder"
+  },
+  "dialog.history.confirm": {
+    "en": "Clear all browsing history?",
+    "zh": "清除全部浏览历史？",
+    "comment": "Confirmation before deleting local browsing history"
+  },
+  "dialog.data.confirm": {
+    "en": "Clear cookies and website data?",
+    "zh": "清除 Cookie 和网站数据？",
+    "comment": "Confirmation before deleting cookies and site storage"
+  },
+  "dialog.data.detail": {
+    "en": "This signs you out of websites and removes their local storage. Your browser settings and AI key are kept.",
+    "zh": "此操作会退出网站登录并删除网站本地数据；浏览器设置和 AI 密钥会保留。",
+    "comment": "Website data deletion impact"
+  },
+  "dialog.cancel": {
+    "en": "Cancel",
+    "zh": "取消",
+    "comment": "Cancel a data deletion confirmation"
+  },
+  "dialog.data.clear": {
+    "en": "Clear website data",
+    "zh": "清除网站数据",
+    "comment": "Confirm website storage deletion"
+  }
+}
