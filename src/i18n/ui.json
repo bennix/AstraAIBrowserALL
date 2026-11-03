@@ -838,5 +838,60 @@
     "en": "Authenticated clients can read signed-in pages. Automated actions allow clicks, typing and navigation without step-by-step prompts. Keep copied credentials private. Disabling MCP stops calls; changes already made are not undone.",
     "zh": "持密钥的客户端可读取已登录网页。开启自动操作后可连续点击、输入及导航，无需逐步确认。请保密复制的配置。关闭 MCP 停止调用，但不会撤销已完成的操作。",
     "comment": "Local MCP settings"
+  },
+  "downloads.started": {
+    "en": "Starting",
+    "zh": "开始下载",
+    "comment": "File download shelf status, size or time label"
+  },
+  "downloads.downloading": {
+    "en": "Downloading",
+    "zh": "下载中",
+    "comment": "File download shelf status, size or time label"
+  },
+  "downloads.paused": {
+    "en": "Paused",
+    "zh": "已暂停",
+    "comment": "File download shelf status, size or time label"
+  },
+  "downloads.interrupted": {
+    "en": "Interrupted",
+    "zh": "下载中断",
+    "comment": "File download shelf status, size or time label"
+  },
+  "downloads.completed": {
+    "en": "Completed",
+    "zh": "已完成",
+    "comment": "File download shelf status, size or time label"
+  },
+  "downloads.cancelled": {
+    "en": "Cancelled",
+    "zh": "已取消",
+    "comment": "File download shelf status, size or time label"
+  },
+  "downloads.unknownSize": {
+    "en": "Unknown size",
+    "zh": "大小未知",
+    "comment": "File download shelf status, size or time label"
+  },
+  "downloads.remaining": {
+    "en": "Remaining",
+    "zh": "剩余",
+    "comment": "File download shelf status, size or time label"
+  },
+  "downloads.resume": {
+    "en": "Resume download",
+    "zh": "继续下载",
+    "comment": "Interrupted file download action or automatic retry status"
+  },
+  "downloads.restart": {
+    "en": "Retry download",
+    "zh": "重新下载",
+    "comment": "Interrupted file download action or automatic retry status"
+  },
+  "downloads.retrying": {
+    "en": "Automatic retry",
+    "zh": "自动重试",
+    "comment": "Interrupted file download action or automatic retry status"
   }
 }

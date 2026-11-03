@@ -2,6 +2,43 @@ const {app,dialog,Menu}=require('electron');const pick=require('./media-picker.c
 const {spawn}=require('node:child_process');const fs=require('node:fs');const os=require('node:os');const path=require('node:path');
 module.exports=function({owner,notify}){
  const jobs=new Map();
+ const browserDownloads=new Map(), sessions=new WeakSet();
+ function bindSession(session){
+  if(sessions.has(session))return;
+  sessions.add(session);
+  session.on('will-download',(_event,item)=>{
+   const id='file-'+require('node:crypto').randomUUID();
+   let previousBytes=item.getReceivedBytes(),previousTime=Date.now(),speed=0,retryTimer=null,attempts=0,terminal=false,cancelled=false;
+   const record={resume,cancel};browserDownloads.set(id,record);
+   function clearRetry(){if(retryTimer){clearTimeout(retryTimer);retryTimer=null;}}
+   const update=(status)=>{
+    const now=Date.now(),receivedBytes=item.getReceivedBytes(),totalBytes=item.getTotalBytes();
+    const elapsed=(now-previousTime)/1000;
+    if(elapsed>=0.25){speed=Math.max(0,(receivedBytes-previousBytes)/elapsed);previousBytes=receivedBytes;previousTime=now;}
+    const paused=item.isPaused(),canResume=!terminal&&item.canResume();
+    notify({id,kind:'file',title:item.getFilename(),status:status==='downloading'&&paused?'paused':status,receivedBytes,totalBytes:totalBytes>0?totalBytes:null,percent:totalBytes>0?Math.min(100,receivedBytes/totalBytes*100):undefined,bytesPerSecond:status==='downloading'&&!paused?speed:0,etaSeconds:status==='downloading'&&!paused&&totalBytes>receivedBytes&&speed>0?Math.ceil((totalBytes-receivedBytes)/speed):null,canResume,canRetry:terminal&&status==='interrupted',retryAttempt:attempts,retrying:retryTimer!==null});
+   };
+   function resume(){
+    if(cancelled)throw Error('Download was cancelled');
+    clearRetry();
+    if(terminal){session.downloadURL(item.getURL());browserDownloads.delete(id);notify({id,status:'cancelled'});return;}
+    if(!item.canResume())throw Error('Download cannot resume yet');
+    previousBytes=item.getReceivedBytes();previousTime=Date.now();speed=0;
+    item.resume();update('downloading');
+   }
+   function cancel(){cancelled=true;clearRetry();if(terminal){browserDownloads.delete(id);notify({id,status:'cancelled'});}else item.cancel();}
+   function scheduleRetry(){
+    if(terminal||cancelled||retryTimer||attempts>=3||!item.canResume())return;
+    const delay=[2000,5000,10000][attempts++];
+    retryTimer=setTimeout(()=>{retryTimer=null;if(terminal||cancelled)return;try{resume();}catch{scheduleRetry();update('interrupted');}},delay);
+   }
+   update('started');
+   const timer=setInterval(()=>{const interrupted=item.getState()==='interrupted';if(interrupted)scheduleRetry();update(interrupted?'interrupted':'downloading');},1000);
+   item.on('updated',(_event,state)=>{if(state==='interrupted')scheduleRetry();else clearRetry();update(state==='interrupted'?'interrupted':'downloading');});
+   item.once('done',(_event,state)=>{terminal=true;clearInterval(timer);clearRetry();update(state);if(state!=='interrupted')browserDownloads.delete(id);});
+  });
+ }
+
  async function start(wc,kind='video',height=1080){
   let url=wc.getURL();if(!/^https?:/.test(url))throw Error('Open a media website first');
   const candidates=await wc.executeJavaScript(fs.readFileSync(path.join(__dirname,'media-candidates.js'),'utf8'));
@@ -45,5 +82,5 @@ module.exports=function({owner,notify}){
  }
  function menu(wc){start(wc).catch(e=>dialog.showErrorBox('Media download',e.message));}
 
- return {start,menu,cancel(id){jobs.get(String(id))?.kill('SIGTERM');},shutdown(){for(const job of jobs.values())job.kill('SIGTERM');}};
+ return {start,menu,bindSession,resume(id){const record=browserDownloads.get(String(id));if(!record)throw Error('Download not found');record.resume();},cancel(id){browserDownloads.get(String(id))?.cancel();jobs.get(String(id))?.kill('SIGTERM');},shutdown(){for(const item of browserDownloads.values())item.cancel();for(const job of jobs.values())job.kill('SIGTERM');}};
 };
