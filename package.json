@@ -5,7 +5,7 @@
   "main": "src/main.cjs",
   "scripts": {
     "start": "electron .",
-    "check": "node --check src/main.cjs && node --check src/preload.cjs && node --check src/renderer.js && node --check src/browser-frames.cjs && node --check src/privacy-preload.cjs && node --check src/proxy-dns.cjs && node --check src/history.cjs && node --check src/bookmarks.cjs && node --check src/i18n.js && node --check src/external-apps.cjs && node --check src/translation.cjs && node --check src/translation-page.js && node --check src/selection-context.js && node --test tests/privacy-preload.test.cjs",
+    "check": "node --check src/main.cjs && node --check src/preload.cjs && node --check src/renderer.js && node --check src/browser-frames.cjs && node --check src/privacy-preload.cjs && node --check src/proxy-dns.cjs && node --check src/history.cjs && node --check src/bookmarks.cjs && node --check src/i18n.js && node --check src/external-apps.cjs && node --check src/translation.cjs && node --check src/translation-page.js && node --check src/selection-context.js && node --test tests/privacy-preload.test.cjs && node --check src/mcp-server.cjs && node --test tests/mcp-server.test.cjs",
     "package": "electron-packager . \"Astra Browser Electron\" --platform=darwin --arch=arm64 --out=dist --overwrite --extra-resource=tools --icon=assets/icons/astra.icns",
     "package:win": "electron-packager . \"Astra Browser Electron\" --platform=win32 --arch=x64 --out=dist --overwrite --icon=assets/icons/astra.ico",
     "package:linux": "electron-packager . \"Astra Browser Electron\" --platform=linux --arch=x64 --out=dist --overwrite --icon=assets/icons/astra.png",
@@ -18,8 +18,10 @@
     "electron-builder": "^26.18.0"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
     "dompurify": "^3.4.17",
-    "marked": "^18.1.2"
+    "marked": "^18.1.2",
+    "zod": "4.6.7"
   },
   "description": "Astra AI browser for macOS, Windows and Linux",
   "author": {

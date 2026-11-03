@@ -152,3 +152,10 @@ window.astra.onState(state=>{latestSearchEngine=state.settings.searchEngine||'go
 $('search-engine-save').onclick=async()=>{
  try{await searchEngineCatalog;await send('search-engine-save',$('search-engine').value);searchEngineDirty=false;const catalog=await dictionaryCatalog;$('search-engine-status').textContent=catalog['settings.search.saved'].zh;}catch(error){$('search-engine-status').textContent=error.message;}
 };
+
+// MCP credentials stay in the main process and are copied only on request.
+async function updateMcp(){try{await send('mcp-settings',{enabled:$('mcp-enabled').checked,automation:$('mcp-automation').checked,port:Number($('mcp-port').value)});}catch(error){$('mcp-status').textContent=error.message;}}
+for(const id of ['enabled','automation','port'])$('mcp-'+id).onchange=updateMcp;
+window.astra.onState(state=>{if(!state.mcp)return;$('mcp-enabled').checked=state.settings.mcpEnabled===true;$('mcp-automation').checked=state.settings.mcpAutomation===true;if(document.activeElement!==$('mcp-port'))$('mcp-port').value=state.settings.mcpPort||17890;$('mcp-status').textContent=state.mcp.url||state.mcp.error||'MCP: off';for(const name of ['codex','json','test'])$('mcp-'+name).disabled=!state.mcp.running;});
+for(const format of ['codex','json'])$('mcp-'+format).onclick=async()=>{try{await send('mcp-copy-config',format);}catch(error){$('mcp-status').textContent=error.message;}};
+$('mcp-test').onclick=async()=>{try{const result=await send('mcp-test');$('mcp-status').textContent='MCP: OK ('+result.tools+' tools)';}catch(error){$('mcp-status').textContent=error.message;}};

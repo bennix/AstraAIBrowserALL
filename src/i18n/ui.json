@@ -798,5 +798,45 @@
     "en": "Daum",
     "zh": "Daum / 韩国",
     "comment": "Search provider name in settings"
+  },
+  "mcp.title": {
+    "en": "MCP integration",
+    "zh": "MCP 接入",
+    "comment": "Local MCP settings"
+  },
+  "mcp.enabled": {
+    "en": "Enable local MCP server",
+    "zh": "启用本地 MCP 服务",
+    "comment": "Local MCP settings"
+  },
+  "mcp.automation": {
+    "en": "Allow automated page actions",
+    "zh": "允许自动网页操作",
+    "comment": "Local MCP settings"
+  },
+  "mcp.port": {
+    "en": "MCP port",
+    "zh": "MCP 端口",
+    "comment": "Local MCP settings"
+  },
+  "mcp.codex": {
+    "en": "Copy Codex configuration",
+    "zh": "复制 Codex 配置",
+    "comment": "Local MCP settings"
+  },
+  "mcp.json": {
+    "en": "Copy MCP JSON configuration",
+    "zh": "复制 MCP JSON 配置",
+    "comment": "Local MCP settings"
+  },
+  "mcp.test": {
+    "en": "Test MCP connection",
+    "zh": "测试 MCP 连接",
+    "comment": "Local MCP settings"
+  },
+  "mcp.help": {
+    "en": "Authenticated clients can read signed-in pages. Automated actions allow clicks, typing and navigation without step-by-step prompts. Keep copied credentials private. Disabling MCP stops calls; changes already made are not undone.",
+    "zh": "持密钥的客户端可读取已登录网页。开启自动操作后可连续点击、输入及导航，无需逐步确认。请保密复制的配置。关闭 MCP 停止调用，但不会撤销已完成的操作。",
+    "comment": "Local MCP settings"
   }
 }
