@@ -90,23 +90,65 @@ $('translation-save').onclick=async()=>{try{await send('translation-preferences'
 })();
 
 const dictionaryCatalog=fetch('i18n/ui.json').then(response=>response.json());
+const dictionaryView={entries:[],catalog:null,page:1,pageSize:1};
+function normalizeDictionaryText(value){return String(value||'').normalize('NFKD').replace(/\p{M}/gu,'').toLowerCase();}
+function dictionaryNearWord(query,word){
+ const limit=query.length>=8?2:1;if(Math.abs(query.length-word.length)>limit)return false;
+ let row=Array.from({length:word.length+1},(_,i)=>i);
+ for(let i=1;i<=query.length;i++){const next=[i];for(let j=1;j<=word.length;j++)next[j]=Math.min(next[j-1]+1,row[j]+1,row[j-1]+(query[i-1]===word[j-1]?0:1));if(Math.min(...next)>limit)return false;row=next;}
+ return row[word.length]<=limit;
+}
+function renderDictionary(){
+ const view=dictionaryView,catalog=view.catalog;if(!catalog)return;
+ const tokens=normalizeDictionaryText($('dictionary-search').value).trim().split(/\s+/).filter(Boolean);
+ const matches=view.entries.filter(record=>tokens.every(token=>record.text.includes(token)||(/^[a-z]{4,48}$/.test(token)&&record.words.some(word=>dictionaryNearWord(token,word)))));
+ const pages=Math.ceil(matches.length/view.pageSize);view.page=Math.min(Math.max(1,view.page),Math.max(1,pages));
+ $('words').replaceChildren();$('dictionary-empty').hidden=view.entries.length>0;$('dictionary-no-results').hidden=!view.entries.length||matches.length>0;
+ $('dictionary-pagination').hidden=!view.entries.length;
+ $('dictionary-page').value=pages?view.page:1;$('dictionary-page').max=Math.max(1,pages);$('dictionary-page').disabled=!pages;
+ for(const id of ['dictionary-first','dictionary-previous'])$(id).disabled=!pages||view.page===1;
+ for(const id of ['dictionary-next','dictionary-last'])$(id).disabled=!pages||view.page===pages;
+ $('dictionary-page-status').textContent=catalog['dictionary.pagination.status'].zh.replace('{page}',pages?view.page:0).replace('{pages}',pages).replace('{count}',matches.length).replace('{total}',view.entries.length);
+ $('dictionary-status').textContent=catalog['dictionary.count'].zh.replace('{count}',view.entries.length);
+ for(const {item} of matches.slice((view.page-1)*view.pageSize,view.page*view.pageSize)){
+  const article=document.createElement('article');article.className='dictionary-entry';
+  const title=document.createElement('h3');title.textContent=item.word;article.append(title);
+  for(const [key,value] of [['meaning',item.translation],['partOfSpeech',item.partOfSpeech],['definition',item.definition],['original',item.original],['contextTranslation',item.contextTranslation],['source',[item.title,item.url].filter(Boolean).join('\n')],['savedAt',item.createdAt]]){
+   if(!value)continue;
+   const row=document.createElement('p'),label=document.createElement('strong');label.textContent=catalog['dictionary.'+key].zh+': ';row.append(label,document.createTextNode(value));article.append(row);
+  }
+  $('words').append(article);
+ }
+}
 async function showDictionary(){
  try{
   const [entries,catalog]=await Promise.all([send('dictionary'),dictionaryCatalog]);
-  $('words').replaceChildren();$('dictionary-empty').hidden=entries.length>0;$('dictionary-status').textContent=catalog['dictionary.count'].zh.replace('{count}',entries.length);
-  for(const item of entries.slice().reverse()){
-   const article=document.createElement('article');article.className='dictionary-entry';
-   const title=document.createElement('h3');title.textContent=item.word;article.append(title);
-   for(const [key,value] of [['meaning',item.translation],['partOfSpeech',item.partOfSpeech],['definition',item.definition],['original',item.original],['contextTranslation',item.contextTranslation],['source',[item.title,item.url].filter(Boolean).join('\n')],['savedAt',item.createdAt]]){
-    if(!value)continue;
-    const row=document.createElement('p'),label=document.createElement('strong');label.textContent=catalog['dictionary.'+key].zh+': ';row.append(label,document.createTextNode(value));article.append(row);
-   }
-   $('words').append(article);
-  }
+  dictionaryView.catalog=catalog;dictionaryView.entries=entries.slice().reverse().map(item=>({item,text:normalizeDictionaryText([item.word,item.translation,item.partOfSpeech,item.definition,item.original,item.contextTranslation,item.title,item.url].filter(Boolean).join(' ')),words:normalizeDictionaryText(item.word).split(/\s+/)}));renderDictionary();
  }catch(error){$('dictionary-status').textContent=error.message;}
 }
+$('dictionary-search').oninput=()=>{dictionaryView.page=1;renderDictionary();};
+$('dictionary-page-size').onchange=()=>{dictionaryView.pageSize=Number($('dictionary-page-size').value)||1;dictionaryView.page=1;renderDictionary();};
+function turnDictionaryPage(page){dictionaryView.page=page;renderDictionary();}
+$('dictionary-first').onclick=()=>turnDictionaryPage(1);
+$('dictionary-previous').onclick=()=>turnDictionaryPage(dictionaryView.page-1);
+$('dictionary-next').onclick=()=>turnDictionaryPage(dictionaryView.page+1);
+$('dictionary-last').onclick=()=>turnDictionaryPage(Number.MAX_SAFE_INTEGER);
+$('dictionary-page').onchange=()=>turnDictionaryPage(Math.floor(Number($('dictionary-page').value))||1);
+$('dictionary-page').onkeydown=event=>{if(event.key==='Enter'){event.preventDefault();$('dictionary-page').onchange();}};
 $('dictionary').onclick=showDictionary;
 $('dictionary-open').onclick=async()=>{await send('dictionary-show');$('preferences').hidden=false;await showDictionary();$('dictionary-section').scrollIntoView({block:'start'});};
 for(const format of ['json','md'])$('dictionary-export-'+format).onclick=async()=>{
  try{const result=await send('dictionary-export',format),catalog=await dictionaryCatalog;$('dictionary-status').textContent=result.canceled?catalog['dictionary.cancelled'].zh:catalog['dictionary.exported'].zh.replace('{count}',result.count).replace('{path}',result.filePath);}catch(error){$('dictionary-status').textContent=error.message;}
+};
+
+let searchEngineDirty=false,latestSearchEngine='google';
+const searchEngineCatalog=fetch('search-engines.json').then(response=>response.json()).then(async engines=>{
+ const catalog=await dictionaryCatalog;
+ for(const engine of engines){const option=document.createElement('option');option.value=engine.id;const copy=catalog['settings.search.engine.'+engine.id];option.textContent=copy?.zh||engine.name;option.title=engine.name;$('search-engine').append(option);}
+ $('search-engine').value=latestSearchEngine;
+});
+$('search-engine').onchange=()=>{searchEngineDirty=true;$('search-engine-status').textContent='';};
+window.astra.onState(state=>{latestSearchEngine=state.settings.searchEngine||'google';if(!searchEngineDirty)$('search-engine').value=latestSearchEngine;});
+$('search-engine-save').onclick=async()=>{
+ try{await searchEngineCatalog;await send('search-engine-save',$('search-engine').value);searchEngineDirty=false;const catalog=await dictionaryCatalog;$('search-engine-status').textContent=catalog['settings.search.saved'].zh;}catch(error){$('search-engine-status').textContent=error.message;}
 };

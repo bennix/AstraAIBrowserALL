@@ -648,5 +648,155 @@
     "en": "Translate · {status}",
     "zh": "翻译 · {status}",
     "comment": "Persistent translation toolbar label with current status"
+  },
+  "settings.search.title": {
+    "en": "Search engine",
+    "zh": "搜索引擎",
+    "comment": "Settings heading for default web search provider"
+  },
+  "settings.search.description": {
+    "en": "Choose the default engine for address-bar searches and new tabs.",
+    "zh": "选择地址栏搜索和新标签页使用的默认引擎。",
+    "comment": "Explains where the selected search provider applies"
+  },
+  "settings.search.default": {
+    "en": "Default search engine",
+    "zh": "默认搜索引擎",
+    "comment": "Label for the search provider selector"
+  },
+  "settings.search.save": {
+    "en": "Save search engine",
+    "zh": "保存搜索引擎",
+    "comment": "Button to persist the selected search provider"
+  },
+  "settings.search.saved": {
+    "en": "Search engine saved.",
+    "zh": "搜索引擎已保存。",
+    "comment": "Status after saving the default search provider"
+  },
+  "dictionary.search.label": {
+    "en": "Search saved entries",
+    "zh": "查找词条",
+    "comment": "Label for local vocabulary search"
+  },
+  "dictionary.search.placeholder": {
+    "en": "Search words, meanings or context",
+    "zh": "搜索词语、释义或上下文",
+    "comment": "Placeholder for local fuzzy vocabulary search"
+  },
+  "dictionary.search.empty": {
+    "en": "No matching entries.",
+    "zh": "没有找到匹配词条。",
+    "comment": "Shown when the vocabulary filter has no results"
+  },
+  "dictionary.pagination.size": {
+    "en": "Entries per page",
+    "zh": "每页词条",
+    "comment": "Label for vocabulary page size selector"
+  },
+  "dictionary.pagination.first": {
+    "en": "First",
+    "zh": "首页",
+    "comment": "Go to the first vocabulary page"
+  },
+  "dictionary.pagination.previous": {
+    "en": "Previous",
+    "zh": "上一页",
+    "comment": "Go to the previous vocabulary page"
+  },
+  "dictionary.pagination.next": {
+    "en": "Next",
+    "zh": "下一页",
+    "comment": "Go to the next vocabulary page"
+  },
+  "dictionary.pagination.last": {
+    "en": "Last",
+    "zh": "末页",
+    "comment": "Go to the last vocabulary page"
+  },
+  "dictionary.pagination.page": {
+    "en": "Page",
+    "zh": "页码",
+    "comment": "Label and accessible name for vocabulary page number"
+  },
+  "dictionary.pagination.status": {
+    "en": "Page {page} of {pages} · {count} matches / {total} entries",
+    "zh": "第 {page} / {pages} 页 · 匹配 {count} 条／共 {total} 条",
+    "comment": "Vocabulary pagination status; page and pages are page numbers, count is filtered entries, total is all saved entries"
+  },
+  "settings.search.engine.google": {
+    "en": "Google",
+    "zh": "Google",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.bing": {
+    "en": "Bing",
+    "zh": "Bing",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.baidu": {
+    "en": "Baidu",
+    "zh": "百度 / Baidu",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.duckduckgo": {
+    "en": "DuckDuckGo",
+    "zh": "DuckDuckGo",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.yahoo": {
+    "en": "Yahoo",
+    "zh": "Yahoo",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.yandex": {
+    "en": "Yandex",
+    "zh": "Yandex",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.brave": {
+    "en": "Brave Search",
+    "zh": "Brave Search",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.ecosia": {
+    "en": "Ecosia",
+    "zh": "Ecosia",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.qwant": {
+    "en": "Qwant",
+    "zh": "Qwant",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.startpage": {
+    "en": "Startpage",
+    "zh": "Startpage",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.sogou": {
+    "en": "Sogou",
+    "zh": "搜狗 / Sogou",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.so360": {
+    "en": "360 Search",
+    "zh": "360 搜索 / 360 Search",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.naver": {
+    "en": "Naver",
+    "zh": "Naver / 韩国",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.yahooJapan": {
+    "en": "Yahoo! Japan",
+    "zh": "Yahoo! 日本",
+    "comment": "Search provider name in settings"
+  },
+  "settings.search.engine.daum": {
+    "en": "Daum",
+    "zh": "Daum / 韩国",
+    "comment": "Search provider name in settings"
   }
 }

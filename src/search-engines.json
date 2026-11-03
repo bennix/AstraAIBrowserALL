@@ -1,0 +1,107 @@
+[
+  {
+    "id": "google",
+    "name": "Google",
+    "url": "https://www.google.com/search",
+    "parameter": "q",
+    "homepage": "https://www.google.com/"
+  },
+  {
+    "id": "bing",
+    "name": "Bing",
+    "url": "https://www.bing.com/search",
+    "parameter": "q",
+    "homepage": "https://www.bing.com/"
+  },
+  {
+    "id": "baidu",
+    "name": "Baidu",
+    "url": "https://www.baidu.com/s",
+    "parameter": "wd",
+    "homepage": "https://www.baidu.com/"
+  },
+  {
+    "id": "duckduckgo",
+    "name": "DuckDuckGo",
+    "url": "https://duckduckgo.com/",
+    "parameter": "q",
+    "homepage": "https://duckduckgo.com/"
+  },
+  {
+    "id": "yahoo",
+    "name": "Yahoo",
+    "url": "https://search.yahoo.com/search",
+    "parameter": "p",
+    "homepage": "https://search.yahoo.com/"
+  },
+  {
+    "id": "yandex",
+    "name": "Yandex",
+    "url": "https://yandex.com/search/",
+    "parameter": "text",
+    "homepage": "https://yandex.com/"
+  },
+  {
+    "id": "brave",
+    "name": "Brave Search",
+    "url": "https://search.brave.com/search",
+    "parameter": "q",
+    "homepage": "https://search.brave.com/"
+  },
+  {
+    "id": "ecosia",
+    "name": "Ecosia",
+    "url": "https://www.ecosia.org/search",
+    "parameter": "q",
+    "homepage": "https://www.ecosia.org/"
+  },
+  {
+    "id": "qwant",
+    "name": "Qwant",
+    "url": "https://www.qwant.com/",
+    "parameter": "q",
+    "homepage": "https://www.qwant.com/"
+  },
+  {
+    "id": "startpage",
+    "name": "Startpage",
+    "url": "https://www.startpage.com/sp/search",
+    "parameter": "query",
+    "homepage": "https://www.startpage.com/"
+  },
+  {
+    "id": "sogou",
+    "name": "Sogou",
+    "url": "https://www.sogou.com/web",
+    "parameter": "query",
+    "homepage": "https://www.sogou.com/"
+  },
+  {
+    "id": "so360",
+    "name": "360 Search",
+    "url": "https://www.so.com/s",
+    "parameter": "q",
+    "homepage": "https://www.so.com/"
+  },
+  {
+    "id": "naver",
+    "name": "Naver",
+    "url": "https://search.naver.com/search.naver",
+    "parameter": "query",
+    "homepage": "https://www.naver.com/"
+  },
+  {
+    "id": "yahooJapan",
+    "name": "Yahoo! Japan",
+    "url": "https://search.yahoo.co.jp/search",
+    "parameter": "p",
+    "homepage": "https://www.yahoo.co.jp/"
+  },
+  {
+    "id": "daum",
+    "name": "Daum",
+    "url": "https://search.daum.net/search",
+    "parameter": "q",
+    "homepage": "https://www.daum.net/"
+  }
+]
