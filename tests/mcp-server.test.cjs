@@ -27,7 +27,8 @@ test('MCP authenticates local clients, gates automation and stops accepting call
   assert.notEqual((await client.callTool({name:'browser_action',arguments:{action:'click',ref:'e1'}})).isError,true);
   assert.equal(writes,1);
   assert.equal((await server.testConnection()).tools,3);
-  assert.equal(fs.statSync(path.join(directory,'key')).mode&0o777,0o600);
+  // Windows uses ACLs rather than POSIX permission bits.
+  if(process.platform!=='win32')assert.equal(fs.statSync(path.join(directory,'key')).mode&0o777,0o600);
   await server.stop();
   await assert.rejects(fetch(url));
  }finally{await client.close();await server.stop();fs.rmSync(directory,{recursive:true,force:true});}
