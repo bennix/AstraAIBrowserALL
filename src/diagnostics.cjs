@@ -11,7 +11,11 @@ function attach(wc){
  wc.on('did-fail-load',(_event,code,_description,url)=>write('load-failed',{id:wc.id,code,url:endpoint(url)}));
  wc.on('render-process-gone',(_event,details)=>write('renderer-gone',{id:wc.id,reason:details.reason,exitCode:details.exitCode}));
  // Do not persist console text: websites may include account data or credentials.
- wc.on('console-message',event=>write('console',{id:wc.id,level:event.level,source:endpoint(event.sourceId),line:event.lineNumber}));
+ wc.on('console-message',event=>{
+  const categories=[['Cross-Origin-Opener-Policy','opener-policy'],['postMessage','window-messaging'],['Blocked by strict fingerprint protection','fingerprint-protection'],['Content Security Policy','content-security-policy'],['identity-credentials-get','federated-identity'],['NotAllowedError','not-allowed']];
+  const category=categories.find(([pattern])=>String(event.message).includes(pattern))?.[1];
+  write('console',{id:wc.id,level:event.level,source:endpoint(event.sourceId),line:event.lineNumber,...(category?{category}:{})});
+ });
  if(!sessions.has(wc.session)){
   sessions.add(wc.session);
   wc.session.webRequest.onCompleted(details=>write('request-completed',{id:details.webContentsId,method:details.method,type:details.resourceType,status:details.statusCode,url:endpoint(details.url)}));
