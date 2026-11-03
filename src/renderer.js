@@ -42,15 +42,16 @@ new MutationObserver(updateAgentControls).observe($('agent-continue'),{attribute
 new MutationObserver(updateAgentControls).observe($('task-observer'),{childList:true});
 $('browser-control').addEventListener('change',updateAgentControls);updateAgentControls();
 
-const resizer=$('ai-resizer');let resizeFrame=0,pendingWidth=360;
-function displayPanelWidth(width){document.documentElement.style.setProperty('--ai-panel-width',width+'px');resizer.setAttribute('aria-valuenow',String(width));}
+const resizer=$('ai-resizer');let resizeFrame=0,pendingWidth=360,resizeDrag=null;
+function displayPanelWidth(width){document.documentElement.style.setProperty('--ai-panel-width',width+'px');resizer.setAttribute('aria-valuenow',String(width));resizer.setAttribute('aria-valuemax',String(Math.max(300,innerWidth-(document.body.classList.contains('tabs-closed')?0:188)-332)));}
 window.astra.onPanelWidth(displayPanelWidth);
+window.astra.onState(()=>displayPanelWidth(Number(resizer.getAttribute('aria-valuenow'))||360));
 function queuePanelResize(width){pendingWidth=width;if(!resizeFrame)resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;send('ai-panel-resize',{width:pendingWidth}).catch(e=>$('ai-status').textContent=e.message);});}
-resizer.addEventListener('pointerdown',event=>{if(event.button!==0)return;event.preventDefault();pendingWidth=Number(resizer.getAttribute('aria-valuenow'));resizer.setPointerCapture(event.pointerId);document.body.classList.add('ai-resizing');});
-resizer.addEventListener('pointermove',event=>{if(resizer.hasPointerCapture(event.pointerId))queuePanelResize(innerWidth-event.clientX);});
-function finishPanelResize(event){if(!resizer.hasPointerCapture(event.pointerId))return;if(resizeFrame){cancelAnimationFrame(resizeFrame);resizeFrame=0;}resizer.releasePointerCapture(event.pointerId);document.body.classList.remove('ai-resizing');send('ai-panel-resize',{width:pendingWidth,persist:true}).catch(e=>$('ai-status').textContent=e.message);}
-resizer.addEventListener('pointerup',finishPanelResize);resizer.addEventListener('pointercancel',finishPanelResize);resizer.addEventListener('lostpointercapture',()=>document.body.classList.remove('ai-resizing'));
-resizer.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home'].includes(event.key))return;event.preventDefault();const width=Number(resizer.getAttribute('aria-valuenow'));send('ai-panel-resize',{width:event.key==='Home'?360:width+(event.key==='ArrowLeft'?20:-20),persist:true}).catch(e=>$('ai-status').textContent=e.message);});
+resizer.addEventListener('pointerdown',event=>{if(event.button!==0||resizeDrag)return;event.preventDefault();resizer.focus();pendingWidth=Number(resizer.getAttribute('aria-valuenow'));resizeDrag={pointerId:event.pointerId,x:event.clientX,width:pendingWidth};resizer.setPointerCapture(event.pointerId);document.body.classList.add('ai-resizing');});
+window.addEventListener('pointermove',event=>{if(resizeDrag?.pointerId===event.pointerId)queuePanelResize(resizeDrag.width+resizeDrag.x-event.clientX);});
+function finishPanelResize(event){if(!resizeDrag||(event?.pointerId!==undefined&&event.pointerId!==resizeDrag.pointerId))return;const pointerId=resizeDrag.pointerId;resizeDrag=null;if(resizeFrame){cancelAnimationFrame(resizeFrame);resizeFrame=0;}if(resizer.hasPointerCapture(pointerId))resizer.releasePointerCapture(pointerId);document.body.classList.remove('ai-resizing');send('ai-panel-resize',{width:pendingWidth,persist:true}).catch(e=>$('ai-status').textContent=e.message);}
+window.addEventListener('pointerup',finishPanelResize);window.addEventListener('pointercancel',finishPanelResize);resizer.addEventListener('lostpointercapture',finishPanelResize);window.addEventListener('blur',()=>finishPanelResize());
+resizer.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const width=Number(resizer.getAttribute('aria-valuenow'));send('ai-panel-resize',{width:event.key==='Home'?360:event.key==='End'?Number(resizer.getAttribute('aria-valuemax')):width+(event.key==='ArrowLeft'?20:-20),persist:true}).catch(e=>$('ai-status').textContent=e.message);});
 
 $('privacy-save').onclick=async()=>{try{$('privacy-status').textContent=await send('privacy-save',{strictPrivacy:$('strict-privacy').checked,secureDns:$('secure-dns').checked});}catch(e){$('privacy-status').textContent=e.message;}};
 window.astra.onState(state=>{$('strict-privacy').checked=state.settings.strictPrivacy!==false;$('secure-dns').checked=state.settings.secureDns!==false;});

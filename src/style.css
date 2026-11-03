@@ -28,7 +28,13 @@ body.tabs-closed aside{display:none}body.tabs-closed header{margin-left:0;paddin
 
 .markdown.waiting{color:#617385;font-size:12px;padding:8px 0}.markdown.waiting::before{content:'◌ ';display:inline-block;animation:ai-wait 1.2s linear infinite}@keyframes ai-wait{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.markdown.waiting::before{animation:none}}
 
-#ai-resizer{position:absolute;left:0;top:0;bottom:0;width:6px;cursor:col-resize;touch-action:none;z-index:10}#ai-resizer:hover,#ai-resizer:focus-visible,body.ai-resizing #ai-resizer{background:#299fd366;outline:none}body.ai-resizing{cursor:col-resize;user-select:none}
+/* Reserve a shell-owned gutter outside the native webpage view. */
+#ai-resizer{position:absolute;right:var(--ai-panel-width,360px);top:54px;bottom:0;width:12px;cursor:col-resize;touch-action:none;z-index:20;background:#edf0f4;border-inline:1px solid #d7dde5;-webkit-app-region:no-drag;user-select:none}
+#ai-resizer::after{content:'';position:absolute;left:4px;top:calc(50% - 18px);width:2px;height:36px;border-radius:2px;background:#97a7b8}
+#ai-resizer:hover,#ai-resizer:focus-visible,body.ai-resizing #ai-resizer{background:#b6def0;outline:2px solid #299fd3;outline-offset:-2px}body.ai-resizing{cursor:col-resize;user-select:none}
+body.ai-closed #ai-resizer{display:none}body.has-downloads #ai-resizer{bottom:124px}
+main{margin-right:calc(var(--ai-panel-width,360px) + 12px)}body.ai-closed main{margin-right:0}
+
 
 header button:disabled{opacity:.35;cursor:default;background:transparent}
 
