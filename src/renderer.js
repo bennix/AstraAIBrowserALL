@@ -163,3 +163,5 @@ for(const id of ['enabled','automation','port'])$('mcp-'+id).onchange=updateMcp;
 window.astra.onState(state=>{if(!state.mcp)return;$('mcp-enabled').checked=state.settings.mcpEnabled===true;$('mcp-automation').checked=state.settings.mcpAutomation===true;if(document.activeElement!==$('mcp-port'))$('mcp-port').value=state.settings.mcpPort||17890;$('mcp-status').textContent=state.mcp.url||state.mcp.error||'MCP: off';for(const name of ['codex','json','test'])$('mcp-'+name).disabled=!state.mcp.running;});
 for(const format of ['codex','json'])$('mcp-'+format).onclick=async()=>{try{await send('mcp-copy-config',format);}catch(error){$('mcp-status').textContent=error.message;}};
 $('mcp-test').onclick=async()=>{try{const result=await send('mcp-test');$('mcp-status').textContent='MCP: OK ('+result.tools+' tools)';}catch(error){$('mcp-status').textContent=error.message;}};
+
+$('login-diagnostics-export').onclick=async()=>{try{await send('login-diagnostics-export');}catch(error){$('data-status').textContent=error.message;}};

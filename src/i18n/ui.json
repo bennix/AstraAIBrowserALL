@@ -893,5 +893,15 @@
     "en": "Automatic retry",
     "zh": "自动重试",
     "comment": "Interrupted file download action or automatic retry status"
+  },
+  "settings.login.exportDiagnostics": {
+    "en": "Export login diagnostics",
+    "zh": "导出登录诊断",
+    "comment": "Settings button to save recent redacted authentication events"
+  },
+  "settings.login.diagnosticsDescription": {
+    "en": "Reproduce the login error, then export recent authentication status events. Passwords, cookies, authorization codes and request bodies are excluded.",
+    "zh": "复现登录错误后，可导出近期认证状态记录。不包含密码、Cookie、授权码或请求正文。",
+    "comment": "Settings explanation of the login diagnostic export privacy boundary"
   }
 }
