@@ -89,3 +89,13 @@ test('disabled strict protection and existing Google compatibility remain unchan
     assert.equal(p.read("new HTMLCanvasElement().getContext('webgl')"), 'webgl');
   }
 });
+
+test('Apple compatibility is limited to exact HTTPS authentication hosts and paths',()=>{
+ for(const [host,route] of [['appleid.apple.com','/auth/authorize'],['idmsa.apple.com','/appleauth/auth/signin']]){const p=page(host,route);assert.equal(p.read('new HTMLCanvasElement().toDataURL("native")'),'native');assert.equal(p.read('new HTMLCanvasElement().getContext("webgl")'),'webgl');}
+ for(const [host,route] of [['appleid.apple.com','/account'],['appleid.apple.com.example.org','/auth/authorize'],['appleid.apple.com','/auth/authorize-extra']]){const p=page(host,route);assert.throws(()=>p.read('new HTMLCanvasElement().toDataURL("native")'));}
+});
+
+test('X signed-out landing forms permit canvas reads while authenticated landing pages remain protected',()=>{
+ const p=page('x.com','/');p.read('document={querySelector:()=>({})}');assert.equal(p.read('new HTMLCanvasElement().toDataURL("native")'),'native');p.read('document.querySelector=()=>null');assert.throws(()=>p.read('new HTMLCanvasElement().toDataURL("native")'));
+ const unrelated=page('example.org','/');unrelated.read('document={querySelector:()=>({})}');assert.throws(()=>unrelated.read('new HTMLCanvasElement().toDataURL("native")'));
+});

@@ -2,10 +2,12 @@ const {contextBridge}=require('electron');
 // Restrict common fingerprint reads before page scripts; official AI and sign-in sites use narrow compatibility exceptions.
 if(process.argv.includes('--astra-strict-privacy'))contextBridge.executeInMainWorld({func:()=>{ const host=location.hostname;
  if(host==='claude.ai'||host.endsWith('.claude.ai')||host==='anthropic.com'||host.endsWith('.anthropic.com')||host==='challenges.cloudflare.com'||host==='gemini.google.com'||host==='accounts.google.com')return;
+ // Apple sign-in widgets require native rendering and font measurements. Scope compatibility to authentication routes.
+ if(location.protocol==='https:'&&['appleid.apple.com','idmsa.apple.com'].includes(host)&&/^\/(?:auth\/(?:authorize|signin)|appleauth\/auth)(?:\/|$)/.test(location.pathname))return;
  const denied=()=>{throw new DOMException('Blocked by strict fingerprint protection','NotAllowedError');};
  const replace=(target,name,value)=>{if(!target)return;try{Object.defineProperty(target,name,{value,writable:false,configurable:false});}catch{}};
- // X's sign-in challenge needs real canvas results. Keep the exception local to its top-level login routes.
- const isXLogin=()=>location.protocol==='https:'&&window===window.top&&['x.com','twitter.com'].includes(location.hostname)&&/^\/(?:i\/(?:flow|jf\/onboarding)(?:\/|$)|login(?:\/|$)|account\/login(?:\/|$))/.test(location.pathname);
+ // X's sign-in challenge needs native canvas reads on login routes and the signed-out landing form.
+ const isXLogin=()=>location.protocol==='https:'&&window===window.top&&['x.com','twitter.com'].includes(location.hostname)&&(/^\/(?:i\/(?:flow|jf\/onboarding)(?:\/|$)|login(?:\/|$)|account\/login(?:\/|$))/.test(location.pathname)||(location.pathname==='/'&&Boolean(globalThis.document?.querySelector('input[autocomplete="username"],input[name="text"],input[name="username"]'))));
  const protectCanvasRead=(target,name)=>{const original=target?.[name];if(typeof original!=='function')return;replace(target,name,function(...args){if(isXLogin())return Reflect.apply(original,this,args);return denied();});};
 
  for(const type of [globalThis.HTMLCanvasElement,globalThis.OffscreenCanvas]){const original=type?.prototype.getContext;if(original)replace(type.prototype,'getContext',function(kind,...args){if(/webgl|webgpu/i.test(String(kind)))return null;return original.call(this,kind,...args);});}
