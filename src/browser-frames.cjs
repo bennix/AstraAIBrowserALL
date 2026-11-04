@@ -8,7 +8,7 @@ module.exports={list,evaluate,applyLocale};
 // Only numeric X onboarding error codes leave this boundary; response bodies stay transient.
 async function observeLogin(wc,record){
  const debug=await connection(wc),requests=new Map();
- const relevant=(value,status)=>{try{const url=new URL(value);return url.protocol==='https:'&&['x.com','api.x.com','twitter.com','api.twitter.com'].includes(url.hostname)&&(/^\/(?:i\/api\/)?(?:1\.1|2)\/(?:onboarding\/[a-z_]+|guest\/activate)\.json$/.test(url.pathname)||(status>=400&&['api.x.com','api.twitter.com'].includes(url.hostname)));}catch{return false;}};
+ const relevant=(value,status)=>{try{const url=new URL(value);return url.protocol==='https:'&&['x.com','api.x.com','twitter.com','api.twitter.com'].includes(url.hostname)&&(/^\/(?:i\/api\/)?(?:1\.1|2)\/(?:onboarding\/[a-z_]+|guest\/activate)(?:\.json)?\/?$/.test(url.pathname)||(status>=400&&['api.x.com','api.twitter.com'].includes(url.hostname)));}catch{return false;}};
  async function message(_event,method,params){
   if(method==='Runtime.exceptionThrown'){const details=params.exceptionDetails||{};const description=String(details.exception?.description||details.text||'');const category=description.includes('Blocked by strict fingerprint protection')?'fingerprint-protection':description.includes('SecurityError')?'security-exception':description.includes('TypeError')?'type-error':'script-exception';record('script-exception',{id:wc.id,url:wc.getURL(),category});}
   else if(method==='Network.responseReceived'&&relevant(params.response?.url,params.response?.status)){
@@ -18,7 +18,7 @@ async function observeLogin(wc,record){
    const request=requests.get(params.requestId);requests.delete(params.requestId);
    try{if(params.encodedDataLength>1024*1024)return;const result=await debug.sendCommand('Network.getResponseBody',{requestId:params.requestId});if(result.base64Encoded||result.body.length>1024*1024)return;const body=JSON.parse(result.body);const errorCodes=Array.isArray(body.errors)?body.errors.map(error=>error.code).filter(Number.isSafeInteger).slice(0,20):[];record('onboarding-response',{id:wc.id,url:request.url,status:request.status,errorCodes,stage:({
  'task.json':'task','sso_init.json':'sso-init','sso_finalize.json':'sso-finalize','activate.json':'guest-activate'
- })[new URL(request.url).pathname.split('/').at(-1)]||'other',subtasks:Array.isArray(body.subtasks)?body.subtasks.map(item=>item.subtask_id).filter(value=>['LoginJsInstrumentationSubtask','LoginEnterUserIdentifierSSO','LoginEnterPassword','LoginTwoFactorAuthChallenge','LoginAcid','LoginSuccessSubtask','LoginOpenHomeTimeline','LoginDeny','LoginSSO','LoginEnterAlternateIdentifierSubtask','AccountDuplicationCheck'].includes(value)).slice(0,20):[]});}catch{}
+ })[new URL(request.url).pathname.replace(/\/$/, '').split('/').at(-1).replace(/(?:\.json)?$/, '.json')]||'other',subtasks:Array.isArray(body.subtasks)?body.subtasks.map(item=>item.subtask_id).filter(value=>['LoginJsInstrumentationSubtask','LoginEnterUserIdentifierSSO','LoginEnterPassword','LoginTwoFactorAuthChallenge','LoginAcid','LoginSuccessSubtask','LoginOpenHomeTimeline','LoginDeny','LoginSSO','LoginEnterAlternateIdentifierSubtask','AccountDuplicationCheck'].includes(value)).slice(0,20):[]});}catch{}
   }
  }
  const listener=(...args)=>{void message(...args).catch(()=>{});};

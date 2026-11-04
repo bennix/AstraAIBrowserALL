@@ -44,42 +44,17 @@ function page(hostname, pathname, { frame = false, strict = true } = {}) {
   };
 }
 
-test('X login routes permit native canvas reads without relaxing audio, WebGL or fonts', () => {
-  for (const host of ['x.com', 'twitter.com']) {
-    for (const route of ['/i/flow/login', '/i/jf/onboarding/web', '/login', '/account/login']) {
-      const p = page(host, route);
-      assert.equal(p.read("new HTMLCanvasElement().toDataURL('image/png')"), 'image/png');
-      assert.equal(p.read('new CanvasRenderingContext2D().getImageData()'), 'native-pixels');
-      assert.equal(p.read('new CanvasRenderingContext2D().measureText()'), 'native-metrics');
-      assert.equal(p.read("new HTMLCanvasElement().getContext('webgl2')"), null);
-      assert.equal(p.read('new FontFaceSet().check()'), false);
-      assert.throws(() => p.read('OfflineAudioContext()'), { name: 'NotAllowedError' });
-    }
+test('X and Grok use native APIs while other sites remain protected', () => {
+  for (const host of ['x.com', 'twitter.com', 'grok.com', 'www.grok.com']) {
+    const p = page(host, '/');
+    assert.equal(p.read("new HTMLCanvasElement().toDataURL('image/png')"), 'image/png');
+    assert.equal(p.read("new HTMLCanvasElement().getContext('webgl2')"), 'webgl2');
+    assert.equal(p.read('new FontFaceSet().check()'), true);
   }
-});
-
-test('canvas protection follows SPA route changes and resumes immediately after login', () => {
-  const p = page('x.com', '/home');
-  assert.throws(() => p.read('new HTMLCanvasElement().toDataURL()'), { name: 'NotAllowedError' });
-  p.navigate('/i/jf/onboarding/web');
-  assert.equal(p.read("new HTMLCanvasElement().toDataURL('image/png')"), 'image/png');
-  p.navigate('/home');
-  assert.throws(() => p.read('new CanvasRenderingContext2D().getImageData()'), { name: 'NotAllowedError' });
-  assert.throws(() => p.read('new OffscreenCanvas().convertToBlob()'), { name: 'NotAllowedError' });
-  p.navigate('/i/flow/login');
-  p.context.location.protocol = 'http:';
-  assert.throws(() => p.read('new HTMLCanvasElement().toDataURL()'), { name: 'NotAllowedError' });
-});
-
-test('unrelated routes, lookalike hosts, subdomains and embedded frames stay protected', () => {
-  for (const [host, route, options] of [
-    ['x.com', '/home'], ['x.com', '/i/flowing/login'], ['x.com', '/login-extra'],
-    ['x.com.example.org', '/i/flow/login'], ['example.org', '/login'],
-    ['media.x.com', '/i/flow/login'], ['x.com', '/i/flow/login', { frame: true }]
-  ]) {
-    const p = page(host, route, options);
+  for (const host of ['example.org', 'x.com.example.org', 'media.x.com', 'grok.com.example.org']) {
+    const p = page(host, '/');
     assert.throws(() => p.read('new HTMLCanvasElement().toDataURL()'), { name: 'NotAllowedError' });
-    assert.throws(() => p.read('new CanvasRenderingContext2D().measureText()'), { name: 'NotAllowedError' });
+    assert.equal(p.read("new HTMLCanvasElement().getContext('webgl2')"), null);
   }
 });
 
@@ -93,9 +68,4 @@ test('disabled strict protection and existing Google compatibility remain unchan
 test('Apple compatibility is limited to exact HTTPS authentication hosts and paths',()=>{
  for(const [host,route] of [['appleid.apple.com','/auth/authorize'],['idmsa.apple.com','/appleauth/auth/signin']]){const p=page(host,route);assert.equal(p.read('new HTMLCanvasElement().toDataURL("native")'),'native');assert.equal(p.read('new HTMLCanvasElement().getContext("webgl")'),'webgl');}
  for(const [host,route] of [['appleid.apple.com','/account'],['appleid.apple.com.example.org','/auth/authorize'],['appleid.apple.com','/auth/authorize-extra']]){const p=page(host,route);assert.throws(()=>p.read('new HTMLCanvasElement().toDataURL("native")'));}
-});
-
-test('X signed-out landing forms permit canvas reads while authenticated landing pages remain protected',()=>{
- const p=page('x.com','/');p.read('document={querySelector:()=>({})}');assert.equal(p.read('new HTMLCanvasElement().toDataURL("native")'),'native');p.read('document.querySelector=()=>null');assert.throws(()=>p.read('new HTMLCanvasElement().toDataURL("native")'));
- const unrelated=page('example.org','/');unrelated.read('document={querySelector:()=>({})}');assert.throws(()=>unrelated.read('new HTMLCanvasElement().toDataURL("native")'));
 });

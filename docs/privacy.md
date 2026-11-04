@@ -6,7 +6,7 @@ Secure DNS is enabled by default. proxy.cjs owns proxy configuration for web, AI
 
 Strict fingerprint controls restrict common canvas, WebGL, audio and font reads in document preloads. Claude/Anthropic domains, gemini.google.com, accounts.google.com and challenges.cloudflare.com are explicit compatibility exceptions for verification; network controls and privacy signals remain active.
 
-On the exact HTTPS hosts x.com and twitter.com, native canvas reads are allowed only in the top-level login/onboarding routes. X's Google sign-in challenge otherwise fails when canvas pixel, export or text-metric reads throw. The wrappers check the current route on every call, so normal canvas restrictions resume when the SPA leaves login; audio, WebGL, font, network and privacy-signal controls are not relaxed by this exception. Embedded frames, subdomains, lookalike hosts and unrelated routes do not receive it. Login pages can therefore read canvas fingerprints during authentication. No credentials are intercepted and no successful-login redirect is forced.
+On HTTPS x.com, twitter.com, grok.com and www.grok.com, strict fingerprint restrictions are bypassed for compatibility. Other hosts retain their existing policy.
 
 Worker/cross-frame coverage and resistance to all fingerprinting methods are not guaranteed. Sites may break when reads are denied. Settings changes to fingerprint controls and JavaScript privacy signals require a restart.
 
@@ -22,4 +22,4 @@ The interface is Chinese-first with English tooltips/menu labels. Website langua
 
 ## X login compatibility validation
 
-On the macOS development build, a clean browser profile completed Google sign-in, Google two-step verification and X email verification, then returned to the authenticated X home timeline without a browser-forced redirect. Restarting the same profile retained its X session. Regression checks cover login-route canvas access, restoration after SPA navigation, HTTPS and exact-host restrictions, embedded-frame exclusion, and unchanged audio/WebGL/font restrictions.
+On the macOS development build, a clean browser profile completed Google sign-in, Google two-step verification and X email verification, then returned to the authenticated X home timeline without a browser-forced redirect. Restarting the same profile retained its X session. Regression checks cover native APIs on X and Grok and continued protection on unrelated hosts.

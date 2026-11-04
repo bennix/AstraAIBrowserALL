@@ -58,7 +58,13 @@ window.addEventListener('pointerup',finishPanelResize);window.addEventListener('
 resizer.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const width=Number(resizer.getAttribute('aria-valuenow'));send('ai-panel-resize',{width:event.key==='Home'?360:event.key==='End'?Number(resizer.getAttribute('aria-valuemax')):width+(event.key==='ArrowLeft'?20:-20),persist:true}).catch(e=>$('ai-status').textContent=e.message);});
 
 $('privacy-save').onclick=async()=>{try{$('privacy-status').textContent=await send('privacy-save',{strictPrivacy:$('strict-privacy').checked,secureDns:$('secure-dns').checked});}catch(e){$('privacy-status').textContent=e.message;}};
-window.astra.onState(state=>{$('strict-privacy').checked=state.settings.strictPrivacy!==false;$('secure-dns').checked=state.settings.secureDns!==false;});
+let savedPrivacy;
+window.astra.onState(({settings})=>{
+ const privacy=[settings.strictPrivacy!==false,settings.secureDns!==false];
+ if(!savedPrivacy||privacy[0]!==savedPrivacy[0])$('strict-privacy').checked=privacy[0];
+ if(!savedPrivacy||privacy[1]!==savedPrivacy[1])$('secure-dns').checked=privacy[1];
+ savedPrivacy=privacy;
+});
 
 function renderHistory(entries){$('history-list').replaceChildren();if(!entries.length){$('history-list').textContent='No browsing history.';return;}for(const entry of entries.slice(0,100)){const row=document.createElement('div');row.className='history-entry';const link=document.createElement('button');link.textContent=entry.title;link.title=entry.url;link.onclick=async()=>{await send('navigate',entry.url);$('preferences').hidden=true;};const date=document.createElement('small');date.textContent=new Date(entry.visitedAt).toLocaleString();row.append(link,date);$('history-list').append(row);}}
 $('history-show').onclick=async()=>renderHistory(await send('history-list'));$('history-clear').onclick=async()=>renderHistory(await send('history-clear'));$('site-data-clear').onclick=async()=>{$('data-status').textContent=await send('site-data-clear');};

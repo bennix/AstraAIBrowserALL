@@ -14,7 +14,7 @@ The Chromium integration layer can observe X onboarding task responses and expor
 
 Apple authorization and authentication-widget paths on appleid.apple.com and idmsa.apple.com remain native authentication popups. These exact HTTPS authentication paths use native rendering and font APIs to avoid a blank authentication form under strict fingerprint restrictions. Unrelated Apple account pages and lookalike hosts keep strict protection. Apple account verification still requires a user-completed sign-in.
 
-X canvas compatibility also covers the signed-out root landing page while a username login input is present. It is checked dynamically at each protected read; removal of the login input restores restrictions. Audio, WebGL and font restrictions on X remain unchanged.
+On HTTPS x.com, twitter.com, grok.com and www.grok.com, strict fingerprint restrictions are bypassed for compatibility. Other hosts retain their existing policy.
 
 The response observer also covers SSO initialization, SSO finalization, version 2 onboarding tasks and guest activation, including HTTP 200 responses that contain application errors. Exports include a fixed stage category and allowlisted login subtask identifiers, never flow tokens or arbitrary subtask content. HTTP success alone does not prove sign-in success.
 
