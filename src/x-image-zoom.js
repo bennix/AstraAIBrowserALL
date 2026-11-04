@@ -55,29 +55,18 @@
       else image.style.removeProperty(name);
     }
   };
-  const isMediaElement = (media) => {
-    const isImage = typeof HTMLImageElement !== 'undefined'
-      && media instanceof HTMLImageElement;
-    const isVideo = typeof HTMLVideoElement !== 'undefined'
-      && media instanceof HTMLVideoElement;
-    return isImage || isVideo;
-  };
-  const isVisible = (media) => {
-    if (!isMediaElement(media)) return false;
+  const isMediaElement = (media) => media instanceof HTMLImageElement;
+  const viewerSelector = '[role="dialog"], [data-testid="swipe-to-dismiss"]';
+  const isPhotoRoute = () => /\/status\/\d+\/photo\/\d+(?:\/|$)/.test(location.pathname);
+  const isViewerMedia = (media) => {
+    if (!isMediaElement(media) || media === state.stage) return false;
     const rect = media.getBoundingClientRect();
     const style = getComputedStyle(media);
-    return rect.width >= 120 && rect.height >= 120
-      && style.display !== 'none' && style.visibility !== 'hidden';
-  };
-  const isViewerMedia = (media) => {
-    if (!isVisible(media)) return false;
-    const source = sourceFor(media);
-    const isXMedia = source.includes('pbs.twimg.com/media/');
-    const isVideo = typeof HTMLVideoElement !== 'undefined'
-      && media instanceof HTMLVideoElement;
-    const isSwipeMedia = Boolean(media.closest('[data-testid="swipe-to-dismiss"]'));
-    return Boolean(media.closest('[role="dialog"], [data-testid="swipe-to-dismiss"]'))
-      && (isVideo || isXMedia || isSwipeMedia);
+    if (rect.width < 120 || rect.height < 120 || style.display === 'none' || style.visibility === 'hidden') return false;
+    let source;
+    try { source = new URL(sourceFor(media)); } catch { return false; }
+    return source.hostname === 'pbs.twimg.com' && source.pathname.startsWith('/media/')
+      && Boolean(media.closest(viewerSelector) || (isPhotoRoute() && media.closest('[data-testid="photo"]')));
   };
   const currentViewerMedia = () => {
     let selected = null;
@@ -91,9 +80,7 @@
       Number(window.innerHeight) || 0
     );
     document.querySelectorAll(
-      '[role="dialog"] img, [role="dialog"] video, '
-        + '[data-testid="swipe-to-dismiss"] img, '
-        + '[data-testid="swipe-to-dismiss"] video'
+      '[role="dialog"] img, [data-testid="swipe-to-dismiss"] img, [data-testid="photo"] img'
     ).forEach((media) => {
       if (!isViewerMedia(media)) return;
       const rect = media.getBoundingClientRect();
@@ -117,7 +104,8 @@
         const sampleX = Math.max(0, Math.min(viewportWidth - 1, rect.left + rect.width / 2));
         const sampleY = Math.max(0, Math.min(viewportHeight - 1, rect.top + rect.height / 2));
         const hitStack = document.elementsFromPoint(sampleX, sampleY);
-        const topMedia = hitStack.find(isMediaElement);
+        const hitMedia = hitStack.find(isMediaElement);
+        const topMedia = hitMedia === state.stage ? state.image : hitMedia;
         hitWeight = topMedia === media ? 8 : (hitStack.includes(media) ? 0.5 : 0.25);
       }
       const score = visibleArea * (1 + visibleRatio) * mediaWeight * hitWeight;
@@ -148,7 +136,7 @@
       && image instanceof HTMLImageElement;
     if (!isImage || !state.baseRect) return null;
     if (state.stage && state.stageRoot?.parentNode) {
-      state.stage.src = sourceFor(image);
+      if (state.stage.src !== sourceFor(image)) state.stage.src = sourceFor(image);
       return state.stage;
     }
     destroyStage();
@@ -521,6 +509,7 @@
   };
   document.addEventListener('pointerup', endPointer, true);
   document.addEventListener('pointercancel', endPointer, true);
+  document.addEventListener('lostpointercapture', endPointer, true);
   document.addEventListener('click', (event) => {
     if (!state.suppressClick || !isZoomVisual(event.target)) return;
     event.preventDefault();
