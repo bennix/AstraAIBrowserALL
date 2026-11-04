@@ -4,19 +4,33 @@ const path=require('node:path');
 const sessions=new WeakSet();
 let file;
 const loginEvents=[];
+const captureStartedAt=new Date().toISOString();let sequence=0,droppedEvents=0;
 function loginEndpoint(value){
- try{const u=new URL(value);if(!['x.com','api.x.com','twitter.com','api.twitter.com','accounts.google.com','accounts.youtube.com','appleid.apple.com','idmsa.apple.com'].includes(u.hostname)||u.protocol!=='https:')return null;const match=/^\/(?:i\/(?:flow|jf\/onboarding|oauth2)|oauth|account\/login|login|(?:i\/api\/)?1\.1\/onboarding|auth\/(?:authorize|signin)|appleauth\/auth)(?:\/|$)/.exec(u.pathname);const route=match?match[0].replace(/\/$/,''):'/[page]';return u.origin+route;}catch{return value==='about:blank'?'about:blank':null;}
+ try{const u=new URL(value);if(!['x.com','api.x.com','twitter.com','api.twitter.com','accounts.google.com','accounts.youtube.com','appleid.apple.com','idmsa.apple.com'].includes(u.hostname)||u.protocol!=='https:')return null;const match=/^\/(?:i\/(?:flow|jf\/onboarding|oauth2)|oauth|account\/login|login|(?:i\/api\/)?(?:1\.1|2)\/(?:onboarding|guest\/activate\.json)|auth\/(?:authorize|signin)|appleauth\/auth)(?:\/|$)/.exec(u.pathname);const route=match?match[0].replace(/\/$/,''):'/[page]';return u.origin+route;}catch{return value==='about:blank'?'about:blank':null;}
 }
 function recordLogin(event,data){
  const url=loginEndpoint(data.url),target=loginEndpoint(data.target);
  if(!url&&!target)return;
- const entry={time:new Date().toISOString(),event,id:data.id};
+ const entry={sequence:++sequence,time:new Date().toISOString(),event,id:data.id};
  if(url)entry.url=url;if(target)entry.target=target;
  for(const key of ['method','type','status','code','category','action','policyMode','operation','coop','coopReportOnly','networkError','openerId','closed','hasOpener'])if(data[key]!==undefined)entry[key]=data[key];
+ if(['task','sso-init','sso-finalize','guest-activate','other'].includes(data.stage))entry.stage=data.stage;
+ if(Array.isArray(data.subtasks))entry.subtasks=data.subtasks.filter(value=>['LoginJsInstrumentationSubtask','LoginEnterUserIdentifierSSO','LoginEnterPassword','LoginTwoFactorAuthChallenge','LoginAcid','LoginSuccessSubtask','LoginOpenHomeTimeline','LoginDeny','LoginSSO','LoginEnterAlternateIdentifierSubtask','AccountDuplicationCheck'].includes(value)).slice(0,20);
  if(Array.isArray(data.errorCodes))entry.errorCodes=data.errorCodes.filter(value=>Number.isSafeInteger(value)).slice(0,20);
- loginEvents.push(entry);if(loginEvents.length>300)loginEvents.shift();
+ loginEvents.push(entry);if(loginEvents.length>1000){loginEvents.shift();droppedEvents++;}
 }
 
+// Export only explicit environment fields; never serialize settings or proxy addresses.
+function loginReport(environment={}){
+ const runtime={};
+ for(const key of ['version','electron','chromium','node','platform','arch','osVersion'])if(typeof environment[key]==='string'&&/^[a-zA-Z0-9._-]{1,80}$/.test(environment[key]))runtime[key]=environment[key];
+ const preferences={};
+ for(const key of ['strictPrivacy','doNotTrack','secureDns'])if(typeof environment[key]==='boolean')preferences[key]=environment[key];
+ if(['system','direct','manual'].includes(environment.proxyMode))preferences.proxyMode=environment.proxyMode;
+ if(['','Asia/Tokyo','America/Los_Angeles','UTC'].includes(environment.timezone))preferences.timezone=environment.timezone;
+ if(typeof environment.languages==='string'&&/^[a-zA-Z,-]{1,80}$/.test(environment.languages))preferences.languages=environment.languages;
+ return {formatVersion:3,version:runtime.version,platform:runtime.platform,exportedAt:new Date().toISOString(),captureStartedAt,runtime,preferences,capture:{limit:1000,droppedEvents,eventCount:loginEvents.length},events:loginEvents.map(entry=>({...entry,...(entry.errorCodes?{errorCodes:[...entry.errorCodes]}:{}),...(entry.subtasks?{subtasks:[...entry.subtasks]}:{})}))};
+}
 function endpoint(value){try{const u=new URL(value);return /^https?:$/.test(u.protocol)?u.origin+u.pathname.replace(/[A-Za-z0-9_-]{48,}/g,'[redacted]'):u.protocol;}catch{return '[invalid URL]';}}
 function write(event,data){try{if(!file){const dir=path.join(app.getPath('userData'),'logs');fs.mkdirSync(dir,{recursive:true});file=path.join(dir,'browser-diagnostics.jsonl');if(fs.existsSync(file)&&fs.statSync(file).size>5*1024*1024)fs.renameSync(file,file+'.previous');}fs.appendFileSync(file,JSON.stringify({time:new Date().toISOString(),event,...data})+'\n',{mode:0o600});}catch(error){console.error('Diagnostic log write failed:',error.code);}}
 function attach(wc,{persist=true}={}){
@@ -47,4 +61,4 @@ function attach(wc,{persist=true}={}){
   wc.session.webRequest.onErrorOccurred(details=>log('request-failed',{id:details.webContentsId,type:details.resourceType,error:details.error,networkError:/^net::ERR_[A-Z_]+$/.test(details.error)?details.error:undefined,url:endpoint(details.url)}));
  }
 }
-module.exports={attach,recordLogin,loginSnapshot:()=>loginEvents.slice()};
+module.exports={attach,recordLogin,loginReport,loginSnapshot:()=>loginEvents.slice()};

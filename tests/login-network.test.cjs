@@ -7,5 +7,11 @@ test('login observer scopes response inspection and exports only numeric error c
  debug.emit('message',{},'Network.responseReceived',{requestId:'x-api',response:{url:'https://api.x.com/1.1/onboarding/task.json',status:403}});debug.emit('message',{},'Network.loadingFinished',{requestId:'x-api',encodedDataLength:100});await new Promise(setImmediate);
  assert.deepEqual(events[0].errorCodes,[399]);assert.equal(JSON.stringify(events).includes('secret-'),false);
  debug.emit('message',{},'Runtime.exceptionThrown',{exceptionDetails:{exception:{description:'NotAllowedError: Blocked by strict fingerprint protection secret-token'}}});assert.equal(events.at(-1).category,'fingerprint-protection');assert.equal(JSON.stringify(events).includes('secret-token'),false);
+
+ for(const [route,stage] of [['/1.1/onboarding/sso_init.json','sso-init'],['/1.1/onboarding/sso_finalize.json','sso-finalize'],['/2/onboarding/task.json','task'],['/1.1/guest/activate.json','guest-activate']]){
+  debug.emit('message',{},'Network.responseReceived',{requestId:route,response:{url:'https://api.x.com'+route,status:200}});
+  debug.emit('message',{},'Network.loadingFinished',{requestId:route,encodedDataLength:100});await new Promise(setImmediate);
+  assert.equal(events.at(-1).stage,stage);assert.deepEqual(events.at(-1).errorCodes,[399]);
+ }
  wc.emit('destroyed');assert.equal(debug.listenerCount('message'),0);
 });
