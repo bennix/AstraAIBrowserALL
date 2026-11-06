@@ -15,17 +15,20 @@ else(async()=>{
  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'astra-native-env-'));let child,file;
  const waitExit=child=>new Promise(r=>child.exitCode!==null||child.signalCode!==null?r():child.once('exit',r));
  try{
-  for(const crash of [false,true]){
-   file=path.join(directory,crash?'crash.json':'normal.json');
+  for(const mode of ['normal','crash','startup']){
+   const crash=mode!=='normal';
+   file=path.join(directory,mode+'.json');
    child=cp.spawn(process.execPath,[__filename,'--owner',file],{env:process.env,stdio:['ignore','pipe','pipe','ipc']});
    let diagnostic='';child.stderr.on('data',c=>diagnostic+=c);
    await new Promise((resolve,reject)=>{const timeout=setTimeout(()=>reject(Error('Environment owner startup timed out')),30000);child.once('message',message=>{clearTimeout(timeout);try{if(!message.ready)throw Error(message.error||'Owner failed');assert.equal(message.processTimezone,profile.timezoneId);assert.equal(message.processLanguage,message.status.systemLocale);resolve();}catch(error){reject(error);}});child.once('exit',code=>{clearTimeout(timeout);if(code!==null&&code!==0)reject(Error(diagnostic||'Owner exited'));});});
    assert.equal((await system.read(['TZ'])).TZ.value,profile.timezoneId);
+   if(mode==='startup'){const record=JSON.parse(fs.readFileSync(file));assert.ok(record.watchdogOwner&&await create.alive(record.watchdogOwner));process.kill(record.watchdogOwner.pid,'SIGKILL');}
    const exited=waitExit(child);if(crash)child.kill('SIGKILL');else child.send('restore');await exited;
+   if(mode==='startup'){const recovery=path.join(directory,'recovery');const executable=process.platform==='win32'?path.join(recovery,'node.exe'):process.execPath;const restorer=cp.spawn(executable,[path.join(recovery,'login-env-watchdog.cjs'),'--recover-default'],{stdio:'ignore'});await waitExit(restorer);assert.equal(restorer.exitCode,0);}
    const deadline=Date.now()+25000;
    while(Date.now()<deadline){const current=await system.read(KEYS);if(isDeepStrictEqual(current,baseline)&&!fs.existsSync(file))break;await new Promise(r=>setTimeout(r,250));}
    assert.deepEqual(await system.read(KEYS),baseline);assert.equal(fs.existsSync(file),false);
-   console.log('PASS '+process.platform+': '+(crash?'forced process termination watchdog':'normal exit')+' restored exact login environment');
+   console.log('PASS '+process.platform+': '+(mode==='startup'?'next-start recovery helper':crash?'forced process termination watchdog':'normal exit')+' restored exact login environment');
   }
  }finally{
   if(child&&child.exitCode===null&&child.signalCode===null){child.kill('SIGKILL');await waitExit(child);}

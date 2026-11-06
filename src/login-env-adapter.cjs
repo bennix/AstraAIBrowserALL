@@ -10,7 +10,7 @@ $OutputEncoding=[Console]::OutputEncoding
 $p=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($env:ASTRA_ENV_PAYLOAD))|ConvertFrom-Json
 $reg=[Microsoft.Win32.Registry]::CurrentUser
 $path=if($p.op -eq 'recovery'){'Software\Microsoft\Windows\CurrentVersion\RunOnce'}else{'Environment'}
-$key=$reg.OpenSubKey($path,$p.op -ne 'read')
+$key=$reg.OpenSubKey($path,($p.op -ne 'read'))
 if(!$key -and $p.op -ne 'read'){$key=$reg.CreateSubKey($path)}
 if($p.op -eq 'read'){
  $out=@{}
@@ -29,10 +29,10 @@ if($p.op -eq 'read'){
  }
 }else{
  $name='AstraBrowserEnvironmentRestore'
- $current=[string]$key.GetValue($name,'')
+ $current=[string]$key.GetValue($name,'',[Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
  if($p.remove){if($current -eq $p.command){$key.DeleteValue($name,$false)}}else{
   if($current -and $current -ne $p.command){throw 'An environment recovery registration already exists'}
-  $key.SetValue($name,$p.command,[Microsoft.Win32.RegistryValueKind]::String)
+  $kind=if($p.expand){[Microsoft.Win32.RegistryValueKind]::ExpandString}else{[Microsoft.Win32.RegistryValueKind]::String};$key.SetValue($name,$p.command,$kind)
  }
 }
 if($key){$key.Close()}
@@ -68,7 +68,7 @@ function adapter(platform=process.platform,execute=run){
    throw Error('Login environment is unsupported on this platform');
   },
   async locales(){if(platform==='win32')return null;return (await execute('/usr/bin/locale',['-a'])).split(/\r?\n/).filter(Boolean);},
-  async recovery(command,remove=false){if(platform==='win32')await powershell({op:'recovery',command,remove});}
+  async recovery(command,remove=false){if(platform==='win32')await powershell({op:'recovery',command,remove,expand:/%(?:APPDATA|LOCALAPPDATA|TEMP)%/.test(command)});}
  };
 }
 module.exports={adapter,KEYS,run};

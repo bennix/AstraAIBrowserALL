@@ -1,6 +1,9 @@
 // Detached, network-free recovery helper. Also used by Windows RunOnce after an interrupted login.
 const fs=require('node:fs'),path=require('node:path');const environment=require('./login-environment.cjs');
-const [file,token,mode]=process.argv.slice(2);
+let [file,token,mode]=process.argv.slice(2);
+if(file==='--recover-default'){
+ try{const target=JSON.parse(fs.readFileSync(path.join(__dirname,'recovery-target.json'),'utf8'));file=target.file;token=target.token;mode='--recover';}catch{process.exit(1);}
+}
 if(!file||!token)process.exit(1);
 process.send?.({ready:true});
 process.on('disconnect',()=>{});

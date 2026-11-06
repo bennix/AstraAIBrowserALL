@@ -62,7 +62,8 @@ async function watchdog({file,token,recoveryDir,nodeExecutable}){
  const directory=recoveryDir||path.join(path.dirname(file),'recovery');fs.mkdirSync(directory,{recursive:true,mode:0o700});
  for(const name of ['login-environment.cjs','login-env-adapter.cjs','login-env-watchdog.cjs'])fs.writeFileSync(path.join(directory,name),fs.readFileSync(path.join(__dirname,name)),{mode:0o600});
  const script=path.join(directory,'login-env-watchdog.cjs');
- let executable=process.execPath;
+ write(path.join(directory,'recovery-target.json'),{file,token});
+ let executable=nodeExecutable||process.execPath;
  if(process.platform==='win32'){
   executable=nodeExecutable;
   if(!executable||!fs.existsSync(executable))throw Error('A bundled Node runtime is required for Windows environment recovery');
@@ -79,7 +80,12 @@ async function watchdog({file,token,recoveryDir,nodeExecutable}){
  const child=cp.spawn(executable,[script,file,token],{detached:true,windowsHide:true,env:{...process.env,ELECTRON_RUN_AS_NODE:'1'},stdio:['ignore','ignore','ignore','ipc']});
  await new Promise((resolve,reject)=>{const timer=setTimeout(()=>{child.kill();reject(Error('Environment recovery watchdog did not start'));},5000);child.once('error',e=>{clearTimeout(timer);reject(e);});child.once('message',message=>{clearTimeout(timer);if(message?.ready)resolve();else reject(Error('Environment recovery watchdog failed'));});child.once('exit',()=>{clearTimeout(timer);reject(Error('Environment recovery watchdog exited'));});});
  child.disconnect();child.unref();
- return process.platform==='win32'?[executable,script,file,token,'--recover'].map(quoteWindows).join(' '):null;
+ const watchdogOwner=await identity(child.pid);
+ if(process.platform!=='win32')return {command:null,owner:watchdogOwner};
+ const portable=value=>{for(const key of ['APPDATA','LOCALAPPDATA','TEMP']){const base=process.env[key];if(base&&value.toLowerCase().startsWith(base.toLowerCase()+path.sep))return '%'+key+'%'+value.slice(base.length);}return value;};
+ const command=[portable(executable),portable(script),'--recover-default'].map(quoteWindows).join(' ');
+ if(command.length>260)throw Error('Windows environment recovery command exceeds the startup path limit');
+ return {command,owner:watchdogOwner};
 }
 module.exports=function createLoginEnvironment({file,system=defaultAdapter(),processEnv=process.env,startWatchdog=watchdog,notify=()=>{},nodeExecutable,isAlive=alive}){
  let token=null,memory=null,status={phase:'idle',active:false};
@@ -101,7 +107,7 @@ module.exports=function createLoginEnvironment({file,system=defaultAdapter(),pro
    const next=profileValues(profile,await system.locales(),record.baseline,options),current=await system.read(KEYS),changes={},skipped=[];
    for(const key of KEYS){if(!equal(current[key],record.last[key])){skipped.push(key);continue;}const target=next.values[key];if(!record.candidates[key].some(v=>equal(v,target)))record.candidates[key].push(target);if(!equal(current[key],target))changes[key]=target;record.last[key]=target;}
    write(file,record);
-   if(first){try{record.recoveryCommand=await startWatchdog({file,token,nodeExecutable});write(file,record);if(record.recoveryCommand)await system.recovery(record.recoveryCommand);}catch(error){await restoreRecord(file,record,system).catch(()=>{});throw error;}}
+   if(first){try{const watcher=await startWatchdog({file,token,nodeExecutable});record.recoveryCommand=typeof watcher==='string'?watcher:watcher?.command||null;record.watchdogOwner=watcher?.owner;write(file,record);if(record.recoveryCommand)await system.recovery(record.recoveryCommand);}catch(error){await restoreRecord(file,record,system).catch(()=>{});throw error;}}
    try{if(Object.keys(changes).length)await system.write(changes);const processValues={...next.values};if(!options.disableToolTelemetry)for(const key of ['DISABLE_TELEMETRY','DISABLE_ERROR_REPORTING'])processValues[key]=memory[key];setMemory(processValues);status={phase:skipped.length?'conflict':'active',active:true,...next.profile,skipped};notify();return status;}
    catch(error){await restoreRecord(file,record,system).catch(()=>{});if(memory)setMemory(memory);throw error;}
   },isAlive);}catch(error){let owned=false;try{owned=Boolean(token)&&read(file)?.token===token;}catch{}status={phase:'error',active:owned,error:error.message};notify();throw error;}
