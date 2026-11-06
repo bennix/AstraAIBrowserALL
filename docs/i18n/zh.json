@@ -62,12 +62,15 @@
   "60": "隐私说明",
   "61": "开源开发预览版。应用及第三方许可证见源代码仓库。",
   "title": "Astra 浏览器 · 翻译、理解与操作",
-  "downloadNote": "0.1.13 提供 macOS Apple Silicon 和 Intel、Windows x64 及 Linux x64 安装包。两个 macOS DMG 均通过 Apple 公证，内含签名应用。Windows 安装程序尚未签名。",
+  "downloadNote": "0.1.14 提供 macOS Apple Silicon 和 Intel、Windows x64 及 Linux x64 安装包。两个 macOS DMG 均通过 Apple 公证，内含签名应用。Windows 安装程序尚未签名。",
   "releaseNotes": "发布说明与 SHA-256 校验值",
   "navigation": "主导航",
   "downloads": "下载",
   "downloadVersion": "0.1.13 新功能",
   "downloadTitle": "按时间段下载长视频",
   "downloadBody": "可选择每段 5、10 或 30 分钟，同时处理两个时间段，显示实时处理进度，并重试未完成的段。所有段完成后自动合并成一个文件。精确切分会重新编码，处理时间取决于视频和电脑性能。",
-  "downloadManage": "可选择同一帖子中的不同视频，或页面已经加载的媒体。下载完成后可打开文件、打开所在目录，确认后可将成品和中间分段一起移到系统废纸篓。重启后仍可查看已完成的下载记录。"
+  "downloadManage": "可选择同一帖子中的不同视频，或页面已经加载的媒体。下载完成后可打开文件、打开所在目录，确认后可将成品和中间分段一起移到系统废纸篓。重启后仍可查看已完成的下载记录。",
+  "graphicsVersion": "0.1.14 新功能",
+  "graphicsTitle": "支持交互式 3D 课堂",
+  "graphicsBody": "WeduLab 等高线课堂可在开启严格指纹保护时正常渲染三维地形。检查更新时也会同时显示本机安装版本和最新可用版本，方便确认更新状态。"
 }
