@@ -27,3 +27,5 @@ On the macOS development build, a clean browser profile completed Google sign-in
 HTTPS labs on wedulab.com and www.wedulab.com can create WebGL/WebGPU canvas contexts for interactive lessons. Canvas export and 2D pixel reads, audio restrictions, and font restrictions still follow strict protection. The exception is checked against the current host and /labs route on every context request.
 
 Google Notebook (`https://notebook.google.com` and the legacy `https://notebooklm.google.com`) uses the same native font/canvas compatibility as Gemini to avoid application bootstrap failures. This adds no exception for other Google subdomains. Image context menus copy decoded images through Chromium’s native clipboard API without requiring page canvas access.
+
+Google account-add windows keep their native authentication flow and shared browser session. After a first-party Google/YouTube application finishes loading, Astra opens that final URL (including account-routing parameters) in a normal tab and closes the login window only after the tab loads successfully. Third-party OAuth callbacks remain in their native windows.
