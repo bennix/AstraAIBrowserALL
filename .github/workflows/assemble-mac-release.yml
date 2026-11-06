@@ -1,0 +1,88 @@
+name: Assemble verified macOS release packages
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Existing draft release tag
+        required: true
+        type: string
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+    steps:
+      - name: Download transport manifest and chunks
+        run: |
+          gh api "repos/$GH_REPO/releases?per_page=100" > releases.json
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          release = next(r for r in json.loads(Path('releases.json').read_text())
+                         if r['tag_name'] == os.environ['RELEASE_TAG'])
+          assert release['draft'], 'Assembly requires a draft release'
+          Path('release-id.txt').write_text(str(release['id']))
+          PY
+          gh release download "$RELEASE_TAG" -p 'transport-manifest.json' -D transport
+          python3 - <<'PY'
+          import json, os, subprocess
+          from concurrent.futures import ThreadPoolExecutor
+          from pathlib import Path
+          manifest = json.loads(Path('transport/transport-manifest.json').read_text())
+          assert manifest['tag'] == os.environ['RELEASE_TAG']
+          names = {p['name'] for f in manifest['files'] for p in f['parts']}
+          def download(name):
+              assert Path(name).name == name and name.startswith('transport-')
+              subprocess.run(['gh', 'release', 'download', os.environ['RELEASE_TAG'],
+                              '-p', name, '-D', 'transport'], check=True)
+          with ThreadPoolExecutor(max_workers=8) as pool:
+              list(pool.map(download, sorted(names)))
+          PY
+      - name: Assemble, upload, and verify
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, subprocess
+          from pathlib import Path
+          root = Path('transport')
+          manifest = json.loads((root / 'transport-manifest.json').read_text())
+          repo = os.environ['GH_REPO']
+          tag = os.environ['RELEASE_TAG']
+          release_id = Path('release-id.txt').read_text()
+          def release():
+              return json.loads(subprocess.check_output(['gh', 'api', f'repos/{repo}/releases/{release_id}']))
+          output = Path('assembled')
+          output.mkdir()
+          for file in manifest['files']:
+              name = file['name']
+              assert Path(name).name == name and name.endswith(('.dmg', '.zip'))
+              target = output / name
+              with target.open('wb') as destination:
+                  for part in file['parts']:
+                      data = (root / part['name']).read_bytes()
+                      assert hashlib.sha256(data).hexdigest() == part['sha256'], 'Chunk checksum mismatch'
+                      destination.write(data)
+              digest = 'sha256:' + hashlib.sha256(target.read_bytes()).hexdigest()
+              assert digest == 'sha256:' + file['sha256'] and target.stat().st_size == file['size']
+              existing = next((a for a in release()['assets'] if a['name'] == name), None)
+              if existing and existing['state'] == 'uploaded':
+                  assert existing['digest'] == digest
+              else:
+                  if existing:
+                      subprocess.run(['gh', 'api', '--method', 'DELETE',
+                                      f'repos/{repo}/releases/assets/{existing["id"]}'], check=True)
+                  subprocess.run(['gh', 'release', 'upload', tag, str(target)], check=True)
+              uploaded = next(a for a in release()['assets'] if a['name'] == name)
+              assert uploaded['state'] == 'uploaded' and uploaded['digest'] == digest
+              print('Verified complete package', name)
+          # Delete only this manifest's transport pieces after every complete package is verified.
+          pieces = {p['name'] for f in manifest['files'] for p in f['parts']}
+          pieces.add('transport-manifest.json')
+          for asset in release()['assets']:
+              if asset['name'] in pieces:
+                  subprocess.run(['gh', 'api', '--method', 'DELETE',
+                                  f'repos/{repo}/releases/assets/{asset["id"]}'], check=True)
+          PY
