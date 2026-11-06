@@ -6,10 +6,10 @@ const vm = require('node:vm');
 
 const source = fs.readFileSync(path.join(__dirname, '../src/privacy-preload.cjs'), 'utf8');
 
-function page(hostname, pathname, { frame = false, strict = true } = {}) {
+function page(hostname, pathname, { frame = false, strict = true, protocol = 'https:' } = {}) {
   const context = vm.createContext({
     DOMException,
-    location: { hostname, pathname, protocol: 'https:' },
+    location: { hostname, pathname, protocol },
     process: { argv: strict ? ['--astra-strict-privacy'] : [] },
     require: () => ({ contextBridge: { executeInMainWorld: ({ func }) => func() } })
   });
@@ -87,4 +87,16 @@ test('WeduLab HTTPS labs can render with WebGL while fingerprint reads stay rest
  }
  const insecure=page('wedulab.com','/labs/contour');insecure.context.location.protocol='http:';
  assert.equal(insecure.read('new HTMLCanvasElement().getContext("webgl2")'),null);
+});
+
+test('Notebook compatibility requires exact HTTPS application hosts', () => {
+  for (const host of ['notebook.google.com', 'notebooklm.google.com']) {
+    const p = page(host, '/');
+    assert.equal(p.read('new CanvasRenderingContext2D().measureText()'), 'native-metrics');
+    assert.equal(p.read('new HTMLCanvasElement().getContext("webgl")'), 'webgl');
+  }
+  for (const p of [page('notebook.google.com.example.org', '/'), page('other.google.com', '/'),
+    page('notebook.google.com', '/', { protocol: 'http:' })]) {
+    assert.throws(() => p.read('new CanvasRenderingContext2D().measureText()'), { name: 'NotAllowedError' });
+  }
 });

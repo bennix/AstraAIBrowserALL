@@ -345,8 +345,8 @@
     "comment": "Browser interface: settings.locale.reload"
   },
   "settings.privacy.description": {
-    "en": "Restricts common document-level canvas, WebGL, audio and font fingerprint reads. Worker and cross-frame fingerprint resistance is not guaranteed. Some sites may not work. Claude, Anthropic, Gemini, Google sign-in and challenges.cloudflare.com use compatibility exceptions for verification. Network privacy protections remain active. It does not hide your account, cookies, IP address or every possible fingerprint.",
-    "zh": "限制常见网页 Canvas、WebGL、音频和字体指纹读取；不保证覆盖 Worker 和跨框架读取，部分网站可能受限。Claude、Anthropic、Gemini、Google 登录和官方 Cloudflare 验证域名使用兼容例外，网络防护仍开启。账号、Cookie、出口 IP 和其他指纹仍可能识别用户。",
+    "en": "Restricts common document-level canvas, WebGL, audio and font fingerprint reads. Worker and cross-frame fingerprint resistance is not guaranteed. Some sites may not work. Claude, Anthropic, Gemini, Google Notebook, Google sign-in and challenges.cloudflare.com use compatibility exceptions for verification. Network privacy protections remain active. It does not hide your account, cookies, IP address or every possible fingerprint.",
+    "zh": "限制常见网页 Canvas、WebGL、音频和字体指纹读取；不保证覆盖 Worker 和跨框架读取，部分网站可能受限。Claude、Anthropic、Gemini、Google Notebook、Google 登录和官方 Cloudflare 验证域名使用兼容例外，网络防护仍开启。账号、Cookie、出口 IP 和其他指纹仍可能识别用户。",
     "comment": "Browser interface: settings.privacy.description"
   },
   "settings.privacy.dnsDescription": {
@@ -903,5 +903,21 @@
     "en": "Reproduce the login error, then export recent authentication status events. Passwords, cookies, authorization codes and request bodies are excluded.",
     "zh": "复现登录错误后，可导出近期认证状态记录。不包含密码、Cookie、授权码或请求正文。",
     "comment": "Settings explanation of the login diagnostic export privacy boundary"
+  },
+  "context.copyImage": {
+    "en": "Copy image",
+    "zh": "复制图片"
+  },
+  "context.copyImageAddress": {
+    "en": "Copy image address",
+    "zh": "复制图片地址"
+  },
+  "context.copy": {
+    "en": "Copy",
+    "zh": "复制"
+  },
+  "context.paste": {
+    "en": "Paste",
+    "zh": "粘贴"
   }
 }
