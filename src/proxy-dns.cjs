@@ -4,14 +4,14 @@ const tls=require('node:tls');
 
 // Resolve visited hostnames through DoH before opening an upstream proxy tunnel.
 // The original HTTPS client keeps its hostname for SNI and certificate validation.
-module.exports=async function createDnsBridge(upstream){
+module.exports=async function createDnsBridge(upstream,{provider='cloudflare'}={}){
  const sockets=new Set(),cache=new Map();
  function track(socket){sockets.add(socket);socket.once('close',()=>sockets.delete(socket));socket.on('error',()=>{});socket.setTimeout(45000,()=>socket.destroy(Error('Connection idle timeout')));return socket;}
  async function resolve(host){
   if(net.isIP(host))return host;
   const cached=cache.get(host);if(cached?.expires>Date.now())return cached.ip;
   for(const type of ['A','AAAA']){
-   const response=await upstream.fetch('https://1.1.1.1/dns-query?name='+encodeURIComponent(host)+'&type='+type,{headers:{accept:'application/dns-json'},signal:AbortSignal.timeout(15000)});
+   const response=await upstream.fetch(require('./dns-providers.cjs').query(provider,host,type),{headers:{accept:'application/dns-json'},signal:AbortSignal.timeout(15000)});
    if(!response.ok)throw Error('Secure DNS service unavailable');
    const result=await response.json();const answer=result.Answer?.find(a=>net.isIP(a.data));
    if(answer){cache.set(host,{ip:answer.data,expires:Date.now()+Math.min(Number(answer.TTL)||60,300)*1000});if(cache.size>2000)cache.delete(cache.keys().next().value);return answer.data;}

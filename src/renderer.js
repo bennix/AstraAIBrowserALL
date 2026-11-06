@@ -77,7 +77,7 @@ function finishPanelResize(event){if(!resizeDrag||(event?.pointerId!==undefined&
 window.addEventListener('pointerup',finishPanelResize);window.addEventListener('pointercancel',finishPanelResize);resizer.addEventListener('lostpointercapture',finishPanelResize);window.addEventListener('blur',()=>finishPanelResize());
 resizer.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const width=Number(resizer.getAttribute('aria-valuenow'));send('ai-panel-resize',{width:event.key==='Home'?360:event.key==='End'?Number(resizer.getAttribute('aria-valuemax')):width+(event.key==='ArrowLeft'?20:-20),persist:true}).catch(e=>$('ai-status').textContent=e.message);});
 
-$('privacy-save').onclick=async()=>{try{$('privacy-status').textContent=await send('privacy-save',{strictPrivacy:$('strict-privacy').checked,secureDns:$('secure-dns').checked});}catch(e){$('privacy-status').textContent=e.message;}};
+$('privacy-save').onclick=async()=>{try{$('privacy-status').textContent=await send('privacy-save',{strictPrivacy:$('strict-privacy').checked,secureDns:$('secure-dns').checked,secureDnsProvider:$('secure-dns-provider').value});}catch(e){$('privacy-status').textContent=e.message;}};
 let savedPrivacy;
 window.astra.onState(({settings})=>{
  const privacy=[settings.strictPrivacy!==false,settings.secureDns!==false];
@@ -187,9 +187,9 @@ $('search-engine-save').onclick=async()=>{
 };
 
 // MCP credentials stay in the main process and are copied only on request.
-async function updateMcp(){try{await send('mcp-settings',{enabled:$('mcp-enabled').checked,automation:$('mcp-automation').checked,port:Number($('mcp-port').value)});}catch(error){$('mcp-status').textContent=error.message;}}
-for(const id of ['enabled','automation','port'])$('mcp-'+id).onchange=updateMcp;
-window.astra.onState(state=>{if(!state.mcp)return;$('mcp-enabled').checked=state.settings.mcpEnabled===true;$('mcp-automation').checked=state.settings.mcpAutomation===true;if(document.activeElement!==$('mcp-port'))$('mcp-port').value=state.settings.mcpPort||17890;$('mcp-status').textContent=state.mcp.url||state.mcp.error||'MCP: off';for(const name of ['codex','json','test'])$('mcp-'+name).disabled=!state.mcp.running;});
+async function updateMcp(){try{await send('mcp-settings',{enabled:$('mcp-enabled').checked,automation:$('mcp-automation').checked,backgroundTabs:$('mcp-background-tabs').checked,port:Number($('mcp-port').value)});}catch(error){$('mcp-status').textContent=error.message;}}
+for(const id of ['enabled','automation','background-tabs','port'])$('mcp-'+id).onchange=updateMcp;
+window.astra.onState(state=>{if(!state.mcp)return;$('mcp-enabled').checked=state.settings.mcpEnabled===true;$('mcp-automation').checked=state.settings.mcpAutomation===true;$('mcp-background-tabs').checked=state.settings.mcpBackgroundTabs===true;if(document.activeElement!==$('mcp-port'))$('mcp-port').value=state.settings.mcpPort||17890;$('mcp-status').textContent=state.mcp.url||state.mcp.error||'MCP: off';for(const name of ['codex','json','test'])$('mcp-'+name).disabled=!state.mcp.running;});
 for(const format of ['codex','json'])$('mcp-'+format).onclick=async()=>{try{await send('mcp-copy-config',format);}catch(error){$('mcp-status').textContent=error.message;}};
 $('mcp-test').onclick=async()=>{try{const result=await send('mcp-test');$('mcp-status').textContent='MCP: OK ('+result.tools+' tools)';}catch(error){$('mcp-status').textContent=error.message;}};
 
@@ -197,3 +197,15 @@ $('login-diagnostics-export').onclick=async()=>{try{await send('login-diagnostic
 
 window.astra.onState(state=>{const auto=state.settings.websiteRegionAuto!==false;const status=state.websiteRegion;const profile=status?.profile;const checkbox=$('website-region-auto');checkbox.checked=auto;if(auto&&profile)$('website-timezone').value=profile.timezoneId;$('website-timezone').disabled=auto;$('website-bilingual').disabled=auto;$('website-region-status').textContent=!auto?'手动设置网站地区 · Manual region':status?.phase==='checking'?'正在通过当前代理查询出口地区…':profile?`${status.phase==='failed'?'查询失败，保留上次匹配 · ':''}${profile.country} · ${profile.timezoneId} · ${profile.acceptLanguage} · ${profile.provider}`:'尚未匹配出口地区；暂用手动或系统配置。';});
 $('website-region-auto').onchange=async()=>{const auto=$('website-region-auto').checked;$('website-timezone').disabled=auto;$('website-bilingual').disabled=auto;await send('website-region-mode',auto);};
+
+window.astra.onState(state=>{
+ const s=state.loginEnvironment||{};const enabled=state.settings.loginEnvFollow===true;$('login-env-follow').dataset.saved=String(enabled);$('tool-telemetry-off').dataset.saved=String(state.settings.disableToolTelemetry===true);
+ if(document.activeElement!==$('login-env-follow'))$('login-env-follow').checked=enabled;
+ $('tool-telemetry-off').checked=state.settings.disableToolTelemetry===true;$('tool-telemetry-off').disabled=!enabled;
+ if(document.activeElement!==$('secure-dns-provider'))$('secure-dns-provider').value=state.settings.secureDnsProvider||'cloudflare';
+ const text=['applying','restoring'].includes(s.phase)?'正在同步／恢复登录环境…':s.error||s.active? (s.error||`${s.timezoneId} · ${s.systemLocale}${s.localeFallback?'（目标 '+s.requestedLanguage+'，使用可用 locale 回退）':''}${s.skipped?.length?' · 保留外部修改：'+s.skipped.join(','):''}`):s.phase==='restored'?'登录环境已恢复 · Restored':'登录环境未启用';
+ $('login-env-status').textContent=text+(s.active&&s.platform==='win32'?' · Windows 原生语言设置保持不变；工具需支持环境变量。':'');$('login-env-badge').hidden=!enabled;$('login-env-badge').textContent=s.phase==='active'?'环境 ✓':'环境 ⚠';$('login-env-badge').title=text;
+});
+$('login-env-follow').onchange=async()=>{try{await send('login-environment-enable',$('login-env-follow').checked);}catch(e){$('login-env-follow').checked=$('login-env-follow').dataset.saved==='true';$('login-env-status').textContent=e.message;}};
+$('tool-telemetry-off').onchange=async()=>{try{await send('login-environment-telemetry',$('tool-telemetry-off').checked);}catch(e){$('tool-telemetry-off').checked=$('tool-telemetry-off').dataset.saved==='true';$('login-env-status').textContent=e.message;}};
+$('login-env-badge').onclick=()=>{if($('preferences').hidden)$('settings').click();$('login-env-status').scrollIntoView({block:'center'});};

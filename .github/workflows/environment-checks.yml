@@ -1,0 +1,36 @@
+name: Verify login environment lifecycle
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/login-env*'
+      - 'tests/login-env*'
+      - '.github/workflows/environment-checks.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  environment:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          env_uid=$(id -u)
+          sudo loginctl enable-linger "$(id -un)"
+          sudo systemctl start "user@$env_uid.service"
+          echo "XDG_RUNTIME_DIR=/run/user/$env_uid" >> "$GITHUB_ENV"
+          echo "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$env_uid/bus" >> "$GITHUB_ENV"
+      - run: node --test tests/login-environment.test.cjs tests/dns-providers.test.cjs tests/mcp-tab-access.test.cjs
+      - run: node tests/login-environment-native.cjs
+        env:
+          ASTRA_REQUIRE_LOGIN_ENV: '1'

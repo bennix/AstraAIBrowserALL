@@ -1,0 +1,2 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');const access=require('../src/mcp-tab-access.cjs');
+test('MCP lists and authorizes only the active tab unless background access is explicitly enabled',()=>{const tabs=[{id:1,title:'active'},{id:2,title:'private background'}];assert.deepEqual(access.visible(tabs,'1'),[tabs[0]]);assert.throws(()=>access.assertAllowed(tabs[1],1),/active tab/);access.assertAllowed(tabs[0],1);assert.deepEqual(access.visible(tabs,1,true),tabs);access.assertAllowed(tabs[1],1,true);});

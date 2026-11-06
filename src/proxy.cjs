@@ -2,6 +2,7 @@ const {app,session}=require('electron');
 let bridge;
 async function applyProxy(preferences){
  const mode=preferences.proxyMode||'system';
+ const dns=require('./dns-providers.cjs').get(preferences.secureDnsProvider||'cloudflare');
  let config;
  if(mode==='manual'){
   const address=new URL(preferences.proxyAddress);
@@ -10,9 +11,9 @@ async function applyProxy(preferences){
  }else if(mode==='system')config={mode:'system'};
  else if(mode==='direct')config={mode:'direct'};
  else throw Error('Invalid proxy mode');
- app.configureHostResolver({enableBuiltInResolver:true,secureDnsMode:preferences.secureDns===false?'off':'secure',secureDnsServers:preferences.secureDns===false?[]:['https://1.1.1.1/dns-query']});
+ app.configureHostResolver({enableBuiltInResolver:true,secureDnsMode:preferences.secureDns===false?'off':'secure',secureDnsServers:preferences.secureDns===false?[]:[dns.wire]});
  const dnsSession=session.fromPartition('astra-secure-dns');await dnsSession.setProxy(config);await dnsSession.closeAllConnections();
- const nextBridge=preferences.secureDns===false?null:await require('./proxy-dns.cjs')(dnsSession);
+ const nextBridge=preferences.secureDns===false?null:await require('./proxy-dns.cjs')(dnsSession,{provider:dns.id});
  const browserConfig=nextBridge?{mode:'fixed_servers',proxyRules:nextBridge.url,proxyBypassRules:'<-loopback>'}:config;
  for(const ses of [session.defaultSession,session.fromPartition('persist:astra-default')]){await ses.setProxy(browserConfig);await ses.clearHostResolverCache();await ses.closeAllConnections();}
  const previous=bridge;bridge=nextBridge;await previous?.close();
