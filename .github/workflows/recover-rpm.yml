@@ -1,4 +1,4 @@
-name: Upload verified RPM to a release
+name: Upload verified build packages to a release
 on:
   workflow_dispatch:
     inputs:
@@ -10,6 +10,18 @@ on:
         description: Existing draft release tag
         required: true
         type: string
+      artifact_name:
+        description: Desktop build artifact
+        required: false
+        default: desktop-Linux
+        type: choice
+        options: [desktop-Linux, desktop-Windows]
+      package_scope:
+        description: Packages to upload
+        required: false
+        default: rpm
+        type: choice
+        options: [rpm, desktop]
 permissions:
   actions: read
   contents: write
@@ -21,6 +33,8 @@ jobs:
       GH_REPO: ${{ github.repository }}
       BUILD_RUN_ID: ${{ inputs.build_run_id }}
       RELEASE_TAG: ${{ inputs.release_tag }}
+      ARTIFACT_NAME: ${{ inputs.artifact_name }}
+      PACKAGE_SCOPE: ${{ inputs.package_scope }}
     steps:
       - name: Verify build and release provenance
         run: |
@@ -37,31 +51,56 @@ jobs:
           assert release['target_commitish'] == build['head_sha'], 'Build and release commits differ'
           Path('release-id.txt').write_text(str(release['id']))
           PY
-      - name: Download Linux build
-        run: gh run download "$BUILD_RUN_ID" -n desktop-Linux -D payload
-      - name: Upload and verify RPM
+      - name: Download desktop build
+        run: gh run download "$BUILD_RUN_ID" -n "$ARTIFACT_NAME" -D payload
+      - name: Prepare manifest verification
         run: |
-          python3 - <<'PY'
-          import hashlib, json, os, subprocess
+          python3 -m venv verify-env
+          verify-env/bin/pip install PyYAML==6.0.2
+      - name: Upload and verify packages
+        run: |
+          verify-env/bin/python - <<'PY'
+          import hashlib, json, os, subprocess, base64
+          import yaml
           from pathlib import Path
           repo = os.environ['GH_REPO']
           tag = os.environ['RELEASE_TAG']
           release_id = Path('release-id.txt').read_text()
           def read_release():
               return json.loads(subprocess.check_output(['gh', 'api', f'repos/{repo}/releases/{release_id}']))
-          packages = list(Path('payload').glob('*.rpm'))
-          assert len(packages) == 1, 'Expected exactly one RPM'
+          payload = Path('payload')
+          if os.environ['PACKAGE_SCOPE'] == 'rpm':
+              packages = list(payload.glob('*.rpm'))
+              assert len(packages) == 1, 'Expected exactly one RPM'
+          else:
+              packages = [p for p in payload.iterdir()
+                          if p.suffix in {'.zip', '.exe', '.rpm', '.deb', '.AppImage', '.blockmap'}
+                          or p.name in {'latest.yml', 'latest-linux.yml'}]
+              assert packages, 'No packages found'
+              for package in packages:
+                  canonical = package.name.replace(' ', '-')
+                  if canonical != package.name:
+                      package.rename(payload / canonical)
+              packages = [payload / p.name.replace(' ', '-') for p in packages]
+              manifests = [p for p in packages if p.suffix == '.yml']
+              assert len(manifests) == 1, 'Expected one platform update manifest'
+              manifest = yaml.safe_load(manifests[0].read_text())
+              assert 'v' + manifest['version'] == tag, 'Update version does not match release'
+              for entry in manifest['files']:
+                  data = (payload / entry['url']).read_bytes()
+                  assert base64.b64encode(hashlib.sha512(data).digest()).decode() == entry['sha512'], 'Update checksum differs'
+                  assert len(data) == entry['size'], 'Update file size differs'
           for package in packages:
               digest = 'sha256:' + hashlib.sha256(package.read_bytes()).hexdigest()
               existing = next((a for a in read_release()['assets'] if a['name'] == package.name), None)
               if existing and existing['state'] == 'uploaded':
-                  assert existing['digest'] == digest, 'Existing RPM checksum differs'
+                  assert existing['digest'] == digest, 'Existing package checksum differs'
               else:
                   if existing:
                       subprocess.run(['gh', 'api', '--method', 'DELETE',
                                       f'repos/{repo}/releases/assets/{existing["id"]}'], check=True)
                   subprocess.run(['gh', 'release', 'upload', tag, str(package)], check=True)
               asset = next(a for a in read_release()['assets'] if a['name'] == package.name)
-              assert asset['state'] == 'uploaded' and asset['digest'] == digest, 'RPM verification failed'
-              print('Verified RPM', package.name)
+              assert asset['state'] == 'uploaded' and asset['digest'] == digest, 'Package verification failed'
+              print('Verified package', package.name)
           PY
