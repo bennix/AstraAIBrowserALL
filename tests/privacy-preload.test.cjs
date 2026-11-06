@@ -69,3 +69,22 @@ test('Apple compatibility is limited to exact HTTPS authentication hosts and pat
  for(const [host,route] of [['appleid.apple.com','/auth/authorize'],['idmsa.apple.com','/appleauth/auth/signin']]){const p=page(host,route);assert.equal(p.read('new HTMLCanvasElement().toDataURL("native")'),'native');assert.equal(p.read('new HTMLCanvasElement().getContext("webgl")'),'webgl');}
  for(const [host,route] of [['appleid.apple.com','/account'],['appleid.apple.com.example.org','/auth/authorize'],['appleid.apple.com','/auth/authorize-extra']]){const p=page(host,route);assert.throws(()=>p.read('new HTMLCanvasElement().toDataURL("native")'));}
 });
+
+test('WeduLab HTTPS labs can render with WebGL while fingerprint reads stay restricted',()=>{
+ for(const host of ['wedulab.com','www.wedulab.com']){
+  const p=page(host,'/labs/contour');
+  assert.equal(p.read('new HTMLCanvasElement().getContext("webgl2")'),'webgl2');
+  assert.equal(p.read('new OffscreenCanvas().getContext("webgl")'),'webgl');
+  assert.throws(()=>p.read('new HTMLCanvasElement().toDataURL("native")'),{name:'NotAllowedError'});
+  assert.throws(()=>p.read('new CanvasRenderingContext2D().getImageData()'),{name:'NotAllowedError'});
+  assert.throws(()=>p.read('OfflineAudioContext()'),{name:'NotAllowedError'});
+  assert.equal(p.read('new FontFaceSet().check()'),false);
+  p.navigate('/account');
+  assert.equal(p.read('new HTMLCanvasElement().getContext("webgl2")'),null);
+ }
+ for(const [host,route] of [['wedulab.com.example.org','/labs/contour'],['example.org','/labs/contour'],['wedulab.com','/labs-extra/contour']]){
+  assert.equal(page(host,route).read('new HTMLCanvasElement().getContext("webgl2")'),null);
+ }
+ const insecure=page('wedulab.com','/labs/contour');insecure.context.location.protocol='http:';
+ assert.equal(insecure.read('new HTMLCanvasElement().getContext("webgl2")'),null);
+});

@@ -23,3 +23,5 @@ The interface is Chinese-first with English tooltips/menu labels. Website langua
 ## X login compatibility validation
 
 On the macOS development build, a clean browser profile completed Google sign-in, Google two-step verification and X email verification, then returned to the authenticated X home timeline without a browser-forced redirect. Restarting the same profile retained its X session. Regression checks cover native APIs on X and Grok and continued protection on unrelated hosts.
+
+HTTPS labs on wedulab.com and www.wedulab.com can create WebGL/WebGPU canvas contexts for interactive lessons. Canvas export and 2D pixel reads, audio restrictions, and font restrictions still follow strict protection. The exception is checked against the current host and /labs route on every context request.

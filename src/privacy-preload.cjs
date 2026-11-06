@@ -5,10 +5,12 @@ if(process.argv.includes('--astra-strict-privacy'))contextBridge.executeInMainWo
  // Apple sign-in widgets require native rendering and font measurements. Scope compatibility to authentication routes.
  if(location.protocol==='https:'&&['appleid.apple.com','idmsa.apple.com'].includes(host)&&/^\/(?:auth\/(?:authorize|signin)|appleauth\/auth)(?:\/|$)/.test(location.pathname))return;
  if(location.protocol==='https:'&&['x.com','twitter.com','grok.com','www.grok.com'].includes(host))return;
+ // These 3D lessons need a rendering context; canvas export/read restrictions still apply.
+ const interactiveLab=()=>location.protocol==='https:'&&['wedulab.com','www.wedulab.com'].includes(location.hostname)&&/^\/labs(?:\/|$)/.test(location.pathname);
  const denied=()=>{throw new DOMException('Blocked by strict fingerprint protection','NotAllowedError');};
  const replace=(target,name,value)=>{if(!target)return;try{Object.defineProperty(target,name,{value,writable:false,configurable:false});}catch{}};
 
- for(const type of [globalThis.HTMLCanvasElement,globalThis.OffscreenCanvas]){const original=type?.prototype.getContext;if(original)replace(type.prototype,'getContext',function(kind,...args){if(/webgl|webgpu/i.test(String(kind)))return null;return original.call(this,kind,...args);});}
+ for(const type of [globalThis.HTMLCanvasElement,globalThis.OffscreenCanvas]){const original=type?.prototype.getContext;if(original)replace(type.prototype,'getContext',function(kind,...args){if(/webgl|webgpu/i.test(String(kind))&&!interactiveLab())return null;return original.call(this,kind,...args);});}
  for(const name of ['AudioContext','webkitAudioContext','OfflineAudioContext','webkitOfflineAudioContext'])if(name in globalThis)replace(globalThis,name,denied);
  for(const name of ['toDataURL','toBlob'])replace(globalThis.HTMLCanvasElement?.prototype,name,denied);
  for(const name of ['getImageData','measureText'])replace(globalThis.CanvasRenderingContext2D?.prototype,name,denied);

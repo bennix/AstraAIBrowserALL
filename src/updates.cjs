@@ -15,11 +15,15 @@ async function checkForUpdate() {
     autoUpdater.autoInstallOnAppQuit = false;
     const result = await autoUpdater.checkForUpdates();
     if (!result?.isUpdateAvailable) {
-      await dialog.showMessageBox({ message: 'Astra Browser is up to date.' });
+      await dialog.showMessageBox({
+        message: 'Astra Browser 已是最新版本',
+        detail: '当前安装版本：'+app.getVersion()+'\n最新可用版本：'+(result?.updateInfo?.version||app.getVersion())
+      });
       return;
     }
     const { response } = await dialog.showMessageBox({
       message: `Astra Browser ${result.updateInfo.version} is available.`,
+      detail: '当前安装版本：'+app.getVersion()+'\n更新版本：'+result.updateInfo.version,
       buttons: ['Download', 'Later'],
       cancelId: 1
     });
