@@ -2,7 +2,7 @@ const languageLink = document.querySelector('#language');
 const requestedLanguage = new URLSearchParams(location.search).get('lang');
 
 async function showChinese() {
-  const response = await fetch('i18n/zh.json?v=0.1.15');
+  const response = await fetch('i18n/zh.json?v=0.1.16');
   if (!response.ok) return;
   const copy = await response.json();
   for (const element of document.querySelectorAll('[data-copy]')) {
