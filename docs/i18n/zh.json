@@ -62,7 +62,7 @@
   "60": "隐私说明",
   "61": "开源开发预览版。应用及第三方许可证见源代码仓库。",
   "title": "Astra 浏览器 · 翻译、理解与操作",
-  "downloadNote": "0.1.16 提供 macOS Apple Silicon 和 Intel、Windows x64 及 Linux x64 安装包。两个 macOS DMG 均通过 Apple 公证，内含签名应用。Windows 安装程序尚未签名。",
+  "downloadNote": "0.1.17 提供 macOS Apple Silicon 和 Intel、Windows x64 及 Linux x64 安装包。两个 macOS DMG 均通过 Apple 公证，内含签名应用。Windows 安装程序尚未签名。",
   "releaseNotes": "发布说明与 SHA-256 校验值",
   "navigation": "主导航",
   "downloads": "下载",
@@ -78,5 +78,8 @@
   "updaterBody": "修复从 GitHub 下载更新包时连接意外关闭的问题。旧版如无法下载更新，请手动安装一次 0.1.15，后续更新即可使用修复后的下载器。",
   "notebookVersion": "0.1.16 新功能",
   "notebookTitle": "Notebook 正常加载，图片随手复制",
-  "notebookBody": "修复 Google Notebook 登录后正文空白，严格保护开启时也可正常加载。图片右键菜单新增“复制图片”和“复制图片地址”，使用 Chromium 原生剪贴板，无需开放网页 Canvas 读取；同时支持选中文本复制和输入框粘贴。"
+  "notebookBody": "修复 Google Notebook 登录后正文空白，严格保护开启时也可正常加载。图片右键菜单新增“复制图片”和“复制图片地址”，使用 Chromium 原生剪贴板，无需开放网页 Canvas 读取；同时支持选中文本复制和输入框粘贴。",
+  "privacyVersion": "0.1.17 新功能",
+  "privacyTitle": "工具栏一键切换隐私保护",
+  "privacyBody": "顶部可直接切换严格指纹保护和出口环境同步，指纹设置变更会提示重启。默认保留 0.1.16 屏蔽模式，也可在设置选择稳定的 Canvas／音频微扰方案。网页时区与语言自动匹配出口地区；可选登录会话环境变量退出恢复，并支持异常恢复，仅之后启动的进程可继承。此功能不能隐藏所有指纹或代理连接。"
 }
