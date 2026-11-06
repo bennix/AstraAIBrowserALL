@@ -11,6 +11,7 @@ async function checkForUpdate() {
   checking = true;
   try {
     const { autoUpdater } = require('electron-updater');
+    require('./update-http.cjs').guardRedirectAbortErrors(autoUpdater.httpExecutor);
     autoUpdater.autoDownload = false;
     autoUpdater.autoInstallOnAppQuit = false;
     const result = await autoUpdater.checkForUpdates();
