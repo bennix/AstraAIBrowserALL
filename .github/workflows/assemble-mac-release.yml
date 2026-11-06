@@ -34,7 +34,13 @@ jobs:
           from pathlib import Path
           manifest = json.loads(Path('transport/transport-manifest.json').read_text())
           assert manifest['tag'] == os.environ['RELEASE_TAG']
-          names = {p['name'] for f in manifest['files'] for p in f['parts']}
+          repo = os.environ['GH_REPO']
+          release_id = Path('release-id.txt').read_text()
+          pages = json.loads(subprocess.check_output(['gh', 'api', '--paginate', '--slurp',
+                            f'repos/{repo}/releases/{release_id}/assets?per_page=100']))
+          existing = {a['name']: a for page in pages for a in page}
+          names = {p['name'] for f in manifest['files'] for p in f['parts']
+                   if existing.get(f['name'], {}).get('digest') != 'sha256:' + f['sha256']}
           def download(name):
               assert Path(name).name == name and name.startswith('transport-')
               subprocess.run(['gh', 'release', 'download', os.environ['RELEASE_TAG'],
@@ -53,12 +59,20 @@ jobs:
           tag = os.environ['RELEASE_TAG']
           release_id = Path('release-id.txt').read_text()
           def release():
-              return json.loads(subprocess.check_output(['gh', 'api', f'repos/{repo}/releases/{release_id}']))
+              data = json.loads(subprocess.check_output(['gh', 'api', f'repos/{repo}/releases/{release_id}']))
+              pages = json.loads(subprocess.check_output(['gh', 'api', '--paginate', '--slurp',
+                                 f'repos/{repo}/releases/{release_id}/assets?per_page=100']))
+              data['assets'] = [asset for page in pages for asset in page]
+              return data
           output = Path('assembled')
           output.mkdir()
           for file in manifest['files']:
               name = file['name']
               assert Path(name).name == name and name.endswith(('.dmg', '.zip'))
+              existing = next((a for a in release()['assets'] if a['name'] == name), None)
+              if existing and existing['state'] == 'uploaded' and existing['digest'] == 'sha256:' + file['sha256']:
+                  print('Verified existing complete package', name)
+                  continue
               target = output / name
               with target.open('wb') as destination:
                   for part in file['parts']:
