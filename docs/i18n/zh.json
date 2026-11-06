@@ -5,7 +5,7 @@
   "3": "源代码",
   "4": "跨语言阅读，保留原文语境。",
   "5": "Astra 是一款基于 Chromium 的桌面浏览器。支持段落翻译、本地词典和 ZenMux AI 工作区，提供 macOS、Windows 和 Linux 安装包。",
-  "6": "媒体修复预览版",
+  "6": "视频全屏与图片操作",
   "7": "视频全屏与 X 图片操作",
   "8": "在 YouTube 或 X 点击播放器的全屏按钮，按 Esc 返回浏览器布局。打开 X 图片后可用控件或滚轮缩放，放大后可拖动查看。",
   "9": "0.1.12 新功能",
@@ -62,8 +62,12 @@
   "60": "隐私说明",
   "61": "开源开发预览版。应用及第三方许可证见源代码仓库。",
   "title": "Astra 浏览器 · 翻译、理解与操作",
-  "downloadNote": "媒体修复预览版提供 Apple Silicon、Windows x64 与 Linux x64（DEB、RPM）安装包。Apple Silicon DMG 已经 Apple 公证，Windows 安装程序未签名。Intel 和 AppImage 提供 0.1.12 基础版本。",
+  "downloadNote": "0.1.13 提供 macOS Apple Silicon 和 Intel、Windows x64 及 Linux x64 安装包。两个 macOS DMG 均通过 Apple 公证，内含签名应用。Windows 安装程序尚未签名。",
   "releaseNotes": "发布说明与 SHA-256 校验值",
   "navigation": "主导航",
-  "downloads": "下载"
+  "downloads": "下载",
+  "downloadVersion": "0.1.13 新功能",
+  "downloadTitle": "按时间段下载长视频",
+  "downloadBody": "可选择每段 5、10 或 30 分钟，同时处理两个时间段，显示实时处理进度，并重试未完成的段。所有段完成后自动合并成一个文件。精确切分会重新编码，处理时间取决于视频和电脑性能。",
+  "downloadManage": "可选择同一帖子中的不同视频，或页面已经加载的媒体。下载完成后可打开文件、打开所在目录，确认后可将成品和中间分段一起移到系统废纸篓。重启后仍可查看已完成的下载记录。"
 }
