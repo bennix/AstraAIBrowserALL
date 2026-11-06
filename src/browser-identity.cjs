@@ -12,7 +12,7 @@ module.exports=function nativeIdentity(){
    await view.webContents.loadURL('https://astra-identity.invalid/');
    const metadata=await view.webContents.executeJavaScript(`navigator.userAgentData.getHighEntropyValues(['architecture','bitness','model','platformVersion','fullVersionList','wow64'])`);
    if(!metadata.brands?.length||!metadata.platform)throw Error('Native Client Hints unavailable');
-   return metadata;
+   return require('./device-hints.cjs')(metadata);
   }finally{view.webContents.close();}
  })();return pending;
 };

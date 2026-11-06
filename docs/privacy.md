@@ -49,3 +49,19 @@ The [Claude Code network documentation](https://code.claude.com/docs/en/network-
 Encrypted DNS now offers explicit Cloudflare or Google selection. Google queries request a zero-length EDNS client subnet. DNS failure still has no plaintext/direct resolver fallback for visited hostnames. DNS-provider/proxy bootstrap remains outside that guarantee. On the tested Malaysia route, both providers reported Singapore resolvers without a shared client subnet; no same-country DNS or proxy-concealment improvement is claimed. The country of a public resolver alone does not establish a leak of the real client IP.
 
 [Exit-adaptive login environment and restoration](session-environment.md) describes the optional cross-platform host-session scope, locale fallbacks, watchdog, and recovery boundaries.
+
+### Detailed device Client Hints
+
+Astra withholds the optional `platformVersion`, `architecture`, `bitness` and
+`model` values through Chromium's native User-Agent metadata override. The same
+metadata is applied to pages and attached Worker/frame targets, covering native
+`navigator.userAgentData` reads and Client Hint request headers without replacing
+those JavaScript methods. Real platform family, mobile status and engine versions
+remain available for compatibility. WebGL/GPU enums, screen geometry, font metrics
+and API constructors remain native; this change does not conceal the operating
+system family, all hardware inference, or a proxy server's TCP fingerprint.
+
+Protocol reference: https://chromedevtools.github.io/devtools-protocol/tot/Emulation/#type-UserAgentMetadata
+Validation: `npm run check` and `npm run check:privacy-browser` (local secure-origin
+fixtures verify empty architecture/OS-version hints and matching page/Worker
+identity while preserving native WebGL rendering and existing Canvas/audio checks).

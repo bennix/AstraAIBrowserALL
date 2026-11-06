@@ -51,6 +51,7 @@ app.whenReady().then(async()=>{
  await first.loadURL('https://one.test/locale');
  const locale=await first.executeJavaScript(`(async()=>{const read=async()=>({ua:navigator.userAgent,hints:await navigator.userAgentData.getHighEntropyValues(['architecture','platformVersion','fullVersionList']),languages:[...navigator.languages],timezone:Intl.DateTimeFormat().resolvedOptions().timeZone});const worker=new Worker(URL.createObjectURL(new Blob(['('+read.toString()+')().then(postMessage)'],{type:'text/javascript'})));const value=await new Promise(r=>worker.onmessage=e=>r(e.data));worker.terminate();return {page:await read(),worker:value};})()`);
  assert.deepEqual(locale.page,locale.worker);assert.equal(locale.page.timezone,'Asia/Kuala_Lumpur');assert.deepEqual(locale.page.languages,['ms-MY','en','zh','ta']);assert.ok(locale.page.hints.brands.length);assert.match(headers.at(-1),/^ms-MY/);assert.equal(agents.at(-1),locale.page.ua);assert.doesNotMatch(agents.at(-1),/Electron\/|astra-browser-electron\//);
+ assert.equal(locale.page.hints.platformVersion,'');assert.equal(locale.page.hints.architecture,'');
  assert.equal(first.getWebRTCIPHandlingPolicy(),'disable_non_proxied_udp');
  console.log('PASS: stable Canvas/PNG/Blob/Offscreen/Audio reads; origin/session isolation; native WebGL/audio constructors; taint security; page/Worker/HTTP locale and Client Hints; native WebRTC policy; normalized HTTP/page/Worker UA and DNT/GPC consistency.');
  for(const win of windows)win.destroy();app.exit(0);
