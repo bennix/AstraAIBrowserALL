@@ -1,0 +1,67 @@
+name: Upload verified RPM to a release
+on:
+  workflow_dispatch:
+    inputs:
+      build_run_id:
+        description: Successful desktop build run ID
+        required: true
+        type: string
+      release_tag:
+        description: Existing draft release tag
+        required: true
+        type: string
+permissions:
+  actions: read
+  contents: write
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      BUILD_RUN_ID: ${{ inputs.build_run_id }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+    steps:
+      - name: Verify build and release provenance
+        run: |
+          gh api "repos/$GH_REPO/actions/runs/$BUILD_RUN_ID" > build.json
+          gh api "repos/$GH_REPO/releases?per_page=100" > releases.json
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          build = json.loads(Path('build.json').read_text())
+          release = next(r for r in json.loads(Path('releases.json').read_text())
+                         if r['tag_name'] == os.environ['RELEASE_TAG'])
+          assert build['conclusion'] == 'success', 'Build did not pass'
+          assert release['draft'], 'Recovery requires a draft release'
+          assert release['target_commitish'] == build['head_sha'], 'Build and release commits differ'
+          Path('release-id.txt').write_text(str(release['id']))
+          PY
+      - name: Download Linux build
+        run: gh run download "$BUILD_RUN_ID" -n desktop-Linux -D payload
+      - name: Upload and verify RPM
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os, subprocess
+          from pathlib import Path
+          repo = os.environ['GH_REPO']
+          tag = os.environ['RELEASE_TAG']
+          release_id = Path('release-id.txt').read_text()
+          def read_release():
+              return json.loads(subprocess.check_output(['gh', 'api', f'repos/{repo}/releases/{release_id}']))
+          packages = list(Path('payload').glob('*.rpm'))
+          assert len(packages) == 1, 'Expected exactly one RPM'
+          for package in packages:
+              digest = 'sha256:' + hashlib.sha256(package.read_bytes()).hexdigest()
+              existing = next((a for a in read_release()['assets'] if a['name'] == package.name), None)
+              if existing and existing['state'] == 'uploaded':
+                  assert existing['digest'] == digest, 'Existing RPM checksum differs'
+              else:
+                  if existing:
+                      subprocess.run(['gh', 'api', '--method', 'DELETE',
+                                      f'repos/{repo}/releases/assets/{existing["id"]}'], check=True)
+                  subprocess.run(['gh', 'release', 'upload', tag, str(package)], check=True)
+              asset = next(a for a in read_release()['assets'] if a['name'] == package.name)
+              assert asset['state'] == 'uploaded' and asset['digest'] == digest, 'RPM verification failed'
+              print('Verified RPM', package.name)
+          PY
