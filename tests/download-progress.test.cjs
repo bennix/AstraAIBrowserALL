@@ -165,6 +165,7 @@ test('time download entry point lists ranges, exposes retry and cleans private f
   module:mod,__dirname:path.join(__dirname,'../src'),Date,URL,process,setTimeout,clearTimeout,
   setInterval:()=>1,clearInterval:()=>{},
   require:name=>{
+   if(name==='node:fs')return {...fs,existsSync:file=>file===path.join(__dirname,'../tools',process.platform==='win32'?'ffmpeg.exe':'ffmpeg')||fs.existsSync(file)};
    if(name==='electron')return {app:{isPackaged:false},dialog:{showOpenDialog:async()=>({canceled:false,filePaths:[directory]}),showMessageBox:async()=>({response:1})},
     shell:{trashItem:async file=>fs.renameSync(file,file+'.trashed')}};
    if(name==='./media-picker.cjs')return async()=>0;
