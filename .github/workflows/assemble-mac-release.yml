@@ -95,7 +95,7 @@ jobs:
           # Delete only this manifest's transport pieces after every complete package is verified.
           pieces = {p['name'] for f in manifest['files'] for p in f['parts']}
           pieces.add('transport-manifest.json')
-          for asset in release()['assets']:
+          for asset in sorted(release()['assets'], key=lambda a: a['name'] == 'transport-manifest.json'):
               if asset['name'] in pieces:
                   subprocess.run(['gh', 'api', '--method', 'DELETE',
                                   f'repos/{repo}/releases/assets/{asset["id"]}'], check=True)
