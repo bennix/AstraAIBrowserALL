@@ -65,3 +65,13 @@ Protocol reference: https://chromedevtools.github.io/devtools-protocol/tot/Emula
 Validation: `npm run check` and `npm run check:privacy-browser` (local secure-origin
 fixtures verify empty architecture/OS-version hints and matching page/Worker
 identity while preserving native WebGL rendering and existing Canvas/audio checks).
+
+### Legacy fingerprint mode
+
+The settings switch “使用 0.1.16 指纹屏蔽模式” defaults on when unset.
+After restarting, it selects the fingerprint preload preserved from release
+0.1.16 (`b788e5b`). Turning it off selects the current Canvas/audio noise preload.
+Both obey the existing strict-protection master switch and retain their site
+compatibility exceptions. The legacy mode can block graphics/audio/font features.
+This selector does not revert other fixes, reduced Client Hints, exit-region
+matching or login-environment settings. Save privacy settings and restart to apply.

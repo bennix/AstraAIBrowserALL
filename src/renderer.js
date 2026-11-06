@@ -77,12 +77,13 @@ function finishPanelResize(event){if(!resizeDrag||(event?.pointerId!==undefined&
 window.addEventListener('pointerup',finishPanelResize);window.addEventListener('pointercancel',finishPanelResize);resizer.addEventListener('lostpointercapture',finishPanelResize);window.addEventListener('blur',()=>finishPanelResize());
 resizer.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const width=Number(resizer.getAttribute('aria-valuenow'));send('ai-panel-resize',{width:event.key==='Home'?360:event.key==='End'?Number(resizer.getAttribute('aria-valuemax')):width+(event.key==='ArrowLeft'?20:-20),persist:true}).catch(e=>$('ai-status').textContent=e.message);});
 
-$('privacy-save').onclick=async()=>{try{$('privacy-status').textContent=await send('privacy-save',{strictPrivacy:$('strict-privacy').checked,secureDns:$('secure-dns').checked,secureDnsProvider:$('secure-dns-provider').value});}catch(e){$('privacy-status').textContent=e.message;}};
+$('privacy-save').onclick=async()=>{try{$('privacy-status').textContent=await send('privacy-save',{strictPrivacy:$('strict-privacy').checked,legacyFingerprint:$('legacy-fingerprint').checked,secureDns:$('secure-dns').checked,secureDnsProvider:$('secure-dns-provider').value});}catch(e){$('privacy-status').textContent=e.message;}};
 let savedPrivacy;
 window.astra.onState(({settings})=>{
- const privacy=[settings.strictPrivacy!==false,settings.secureDns!==false];
+ const privacy=[settings.strictPrivacy!==false,settings.secureDns!==false,settings.legacyFingerprint!==false];
  if(!savedPrivacy||privacy[0]!==savedPrivacy[0])$('strict-privacy').checked=privacy[0];
  if(!savedPrivacy||privacy[1]!==savedPrivacy[1])$('secure-dns').checked=privacy[1];
+ if(!savedPrivacy||privacy[2]!==savedPrivacy[2])$('legacy-fingerprint').checked=privacy[2];
  savedPrivacy=privacy;
 });
 
