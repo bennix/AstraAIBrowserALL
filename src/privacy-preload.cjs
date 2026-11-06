@@ -70,4 +70,12 @@ if(process.argv.includes('--astra-strict-privacy'))contextBridge.executeInMainWo
  });
  replace(audioProto,'copyToChannel',native=>function(source,channel,...args){const result=native.call(this,source,channel,...args);audioChannels.delete(nativeChannel.call(this,channel).buffer);return result;});
 }});
-if(process.argv.includes('--astra-do-not-track'))contextBridge.executeInMainWorld({func:()=>{try{Object.defineProperty(Navigator.prototype,'globalPrivacyControl',{get:()=>true});}catch{}}});
+if(process.argv.includes('--astra-do-not-track'))contextBridge.executeInMainWorld({func:()=>{
+ try{
+  const descriptor=Object.getOwnPropertyDescriptor(Navigator.prototype,'doNotTrack');
+  const native=descriptor?.get;
+  const get=native?new Proxy(native,{apply:(method,receiver,args)=>{Reflect.apply(method,receiver,args);return '1';}}):function(){return '1';};
+  Object.defineProperty(Navigator.prototype,'doNotTrack',{configurable:true,enumerable:true,...descriptor,get});
+  Object.defineProperty(Navigator.prototype,'globalPrivacyControl',{configurable:true,enumerable:true,get:()=>true});
+ }catch{}
+}});
