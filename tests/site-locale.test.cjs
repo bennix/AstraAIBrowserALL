@@ -1,0 +1,2 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');const {timezone}=require('../src/site-locale.cjs');
+test('website timezone accepts real IANA regions and system default, while rejecting unknown zones',()=>{assert.equal(timezone(''),'');for(const zone of ['Asia/Kuala_Lumpur','Asia/Tokyo','America/Los_Angeles','Europe/Paris','UTC'])assert.equal(timezone(zone),new Intl.DateTimeFormat('en',{timeZone:zone}).resolvedOptions().timeZone);for(const value of ['somewhere',null,{},'Asia/Example'])assert.throws(()=>timezone(value),/Invalid website timezone/);});

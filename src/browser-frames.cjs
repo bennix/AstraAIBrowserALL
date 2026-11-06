@@ -2,7 +2,42 @@ async function connection(wc){if(!wc.debugger.isAttached())wc.debugger.attach('1
 async function list(wc){const debug=await connection(wc);const {frameTree}=await debug.sendCommand('Page.getFrameTree');const frames=[];function walk(node){frames.push({frameId:node.frame.id,parentId:node.frame.parentId||null,name:node.frame.name||'',url:node.frame.url});for(const child of node.childFrames||[])walk(child);}walk(frameTree);return {data:{frames}};}
 async function evaluate(wc,frameId,code){const debug=await connection(wc);const frames=await list(wc);if(!frames.data.frames.some(f=>f.frameId===frameId))throw Error('Frame disappeared. List frames again.');const {executionContextId}=await debug.sendCommand('Page.createIsolatedWorld',{frameId,worldName:'astra-huashu',grantUniveralAccess:false});const result=await debug.sendCommand('Runtime.evaluate',{expression:code,contextId:executionContextId,awaitPromise:true,returnByValue:true});if(result.exceptionDetails)throw Error(result.exceptionDetails.exception?.description||result.exceptionDetails.text);return result.result?.value;}
 const localeProfiles=new WeakMap();
-async function applyLocale(wc,profile){const key=JSON.stringify(profile);const previous=localeProfiles.get(wc);if(previous?.key===key)return previous.promise;const promise=(async()=>{await previous?.promise.catch(()=>{});const debug=await connection(wc);await debug.sendCommand('Emulation.setTimezoneOverride',{timezoneId:profile.timezoneId||''});await debug.sendCommand('Emulation.setLocaleOverride',{locale:profile.locale||''});await debug.sendCommand('Emulation.setUserAgentOverride',{userAgent:wc.getUserAgent(),acceptLanguage:profile.acceptLanguage});})();localeProfiles.set(wc,{key,promise});try{await promise;}catch(error){localeProfiles.delete(wc);throw error;}}
+const workerLocales=new WeakMap();
+async function applyLocale(wc,profile){
+ const key=JSON.stringify(profile),previous=localeProfiles.get(wc);
+ if(previous?.key===key)return previous.promise;
+ const promise=(async()=>{
+  await previous?.promise.catch(()=>{});
+  const debug=await connection(wc),metadata=await require('./browser-identity.cjs')();
+  const override={userAgent:wc.getUserAgent(),acceptLanguage:profile.acceptLanguage,userAgentMetadata:metadata};
+  let workers=workerLocales.get(wc);
+  if(!workers){
+   workers={override,sessions:new Set()};workerLocales.set(wc,workers);
+   const listener=(_event,method,params)=>{
+    if(method==='Target.detachedFromTarget'){workers.sessions.delete(params.sessionId);return;}
+    if(method!=='Target.attachedToTarget')return;
+    const id=params.sessionId;
+    void(async()=>{
+     try{
+      if(['worker','shared_worker','service_worker','iframe'].includes(params.targetInfo.type)){
+       workers.sessions.add(id);
+       await debug.sendCommand('Emulation.setUserAgentOverride',workers.override,id);
+       await debug.sendCommand('Target.setAutoAttach',{autoAttach:true,waitForDebuggerOnStart:true,flatten:true},id).catch(()=>{});
+      }
+     }catch{}finally{await debug.sendCommand('Runtime.runIfWaitingForDebugger',{},id).catch(()=>{});}
+    })();
+   };
+   debug.on('message',listener);wc.once('destroyed',()=>{debug.removeListener('message',listener);workers.sessions.clear();});
+  }
+  workers.override=override;
+  await debug.sendCommand('Target.setAutoAttach',{autoAttach:true,waitForDebuggerOnStart:true,flatten:true});
+  await debug.sendCommand('Emulation.setTimezoneOverride',{timezoneId:profile.timezoneId||''});
+  await debug.sendCommand('Emulation.setLocaleOverride',{locale:profile.locale||''});
+  await debug.sendCommand('Emulation.setUserAgentOverride',override);
+  await Promise.all([...workers.sessions].map(id=>debug.sendCommand('Emulation.setUserAgentOverride',override,id).catch(()=>{})));
+ })();
+ localeProfiles.set(wc,{key,promise});try{await promise;}catch(error){localeProfiles.delete(wc);throw error;}
+}
 module.exports={list,evaluate,applyLocale};
 
 // Only numeric X onboarding error codes leave this boundary; response bodies stay transient.

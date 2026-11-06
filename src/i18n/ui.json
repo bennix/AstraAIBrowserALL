@@ -345,8 +345,8 @@
     "comment": "Browser interface: settings.locale.reload"
   },
   "settings.privacy.description": {
-    "en": "Restricts common document-level canvas, WebGL, audio and font fingerprint reads. Worker and cross-frame fingerprint resistance is not guaranteed. Some sites may not work. Claude, Anthropic, Gemini, Google Notebook, Google sign-in and challenges.cloudflare.com use compatibility exceptions for verification. Network privacy protections remain active. It does not hide your account, cookies, IP address or every possible fingerprint.",
-    "zh": "限制常见网页 Canvas、WebGL、音频和字体指纹读取；不保证覆盖 Worker 和跨框架读取，部分网站可能受限。Claude、Anthropic、Gemini、Google Notebook、Google 登录和官方 Cloudflare 验证域名使用兼容例外，网络防护仍开启。账号、Cookie、出口 IP 和其他指纹仍可能识别用户。",
+    "en": "Uses stable per-origin/session noise for common Canvas and audio readouts. WebGL rendering, font metrics and API constructors remain available. Selected verification sites retain compatibility exceptions. Native WebRTC proxy policy remains active. JS modifications can be detected; workers and cross-frame coverage are not guaranteed. This does not hide your account, IP, proxy or every fingerprint.",
+    "zh": "对常见 Canvas 和音频读出加入同来源、同会话内稳定的微扰。保留 WebGL 渲染、字体度量和 API 构造函数，部分验证网站仍使用兼容例外，内核 WebRTC 代理策略继续开启。JS 修改可被检测，不保证覆盖 Worker 和跨框架读取；不会隐藏账号、IP、代理或所有指纹。",
     "comment": "Browser interface: settings.privacy.description"
   },
   "settings.privacy.dnsDescription": {
