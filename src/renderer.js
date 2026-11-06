@@ -210,3 +210,8 @@ window.astra.onState(state=>{
 $('login-env-follow').onchange=async()=>{try{await send('login-environment-enable',$('login-env-follow').checked);}catch(e){$('login-env-follow').checked=$('login-env-follow').dataset.saved==='true';$('login-env-status').textContent=e.message;}};
 $('tool-telemetry-off').onchange=async()=>{try{await send('login-environment-telemetry',$('tool-telemetry-off').checked);}catch(e){$('tool-telemetry-off').checked=$('tool-telemetry-off').dataset.saved==='true';$('login-env-status').textContent=e.message;}};
 $('login-env-badge').onclick=async()=>{const badge=$('login-env-badge');if(badge.disabled)return;badge.disabled=true;try{await send('login-environment-enable',badge.dataset.enabled!=='true');}catch(error){badge.title=error.message;$('login-env-status').textContent=error.message;window.alert(error.message);}finally{badge.disabled=false;}};
+
+// Native preload restrictions cannot safely be undone in an existing document.
+// Show saved and running state separately until the browser is restarted.
+window.astra.onState(state=>{const button=$('fingerprint-toggle'),enabled=state.settings.strictPrivacy!==false,pending=enabled!==state.fingerprintActive;button.dataset.enabled=String(enabled);button.setAttribute('aria-pressed',String(enabled));button.textContent='指纹保护 '+(enabled?'开':'关')+(pending?' · 待重启':'');button.title=(enabled?'点击关闭严格指纹保护':'点击开启严格指纹保护')+'；重启后生效，不改变环境同步与指纹模式选择。';});
+$('fingerprint-toggle').onclick=async()=>{const button=$('fingerprint-toggle');if(button.disabled)return;button.disabled=true;try{await send('fingerprint-toggle',button.dataset.enabled!=='true');}catch(error){window.alert(error.message);}finally{button.disabled=false;}};
