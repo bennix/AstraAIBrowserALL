@@ -75,3 +75,22 @@ Both obey the existing strict-protection master switch and retain their site
 compatibility exceptions. The legacy mode can block graphics/audio/font features.
 This selector does not revert other fixes, reduced Client Hints, exit-region
 matching or login-environment settings. Save privacy settings and restart to apply.
+
+### IPv6-only proxy exits
+
+The encrypted DNS bridge queries both A and AAAA records, retains multiple usable
+addresses and staggers connection attempts through the selected proxy. A rejected
+or blackholed IPv4 destination no longer prevents trying IPv6. SOCKS5 uses the
+numeric IPv4/IPv6 address types from RFC 1928; HTTP CONNECT brackets IPv6 literals.
+Plain HTTP IPv6 literals do not enter DNS resolution. Cloudflare DoH uses the
+official dual-stack `https://cloudflare-dns.com/dns-query` endpoint rather than a
+fixed IPv4 literal. DNS, TLS validation and configured proxy routing remain in
+force; failed proxy attempts do not add an unconfigured direct fallback.
+
+Tests use local IPv6 proxy fixtures on macOS, Windows and Linux, including an
+IPv6-only exit, blackholed IPv4, failed A lookup, literal IPv6, HTTP CONNECT,
+SOCKS5 and fail-closed behavior. These do not replace testing a user's provider.
+An IPv6-only exit still needs provider-side translation to reach IPv4-only sites.
+
+References: https://www.rfc-editor.org/info/rfc1928/ and
+https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/make-api-requests/dns-json/

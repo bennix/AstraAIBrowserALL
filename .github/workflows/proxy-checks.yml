@@ -1,0 +1,27 @@
+name: Verify IPv6 proxy compatibility
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/proxy*.cjs'
+      - 'src/dns-providers.cjs'
+      - 'tests/proxy-dns.test.cjs'
+      - 'tests/dns-providers.test.cjs'
+      - '.github/workflows/proxy-checks.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  proxy:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node --test tests/proxy-dns.test.cjs tests/dns-providers.test.cjs
