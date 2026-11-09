@@ -62,7 +62,7 @@
   "60": "隐私说明",
   "61": "开源开发预览版。应用及第三方许可证见源代码仓库。",
   "title": "Astra 浏览器 · 翻译、理解与操作",
-  "downloadNote": "0.1.18 提供 macOS Apple Silicon 和 Intel、Windows x64 及 Linux x64 安装包。两个 macOS DMG 均通过 Apple 公证，内含签名应用。Windows 安装程序尚未签名。",
+  "downloadNote": "0.1.19 提供 macOS Apple Silicon 和 Intel、Windows x64 及 Linux x64 安装包。两个 macOS DMG 均通过 Apple 公证，内含签名应用。Windows 安装程序尚未签名。",
   "releaseNotes": "发布说明与 SHA-256 校验值",
   "navigation": "主导航",
   "downloads": "下载",
@@ -84,5 +84,8 @@
   "privacyBody": "顶部可直接切换严格指纹保护和出口环境同步，指纹设置变更会提示重启。默认保留 0.1.16 屏蔽模式，也可在设置选择稳定的 Canvas／音频微扰方案。网页时区与语言自动匹配出口地区；可选登录会话环境变量退出恢复，并支持异常恢复，仅之后启动的进程可继承。此功能不能隐藏所有指纹或代理连接。",
   "ipv6Version": "0.1.18 新功能",
   "ipv6Title": "兼容纯 IPv6 代理出口",
-  "ipv6Body": "加密 DNS 同时查询两种地址；IPv4 失败或卡住时尝试 IPv6，并记住成功地址。HTTP 和 SOCKS5 隧道支持 IPv6 目标，代理路由及证书校验仍然保留。仅支持 IPv4 的网站仍需要代理商提供地址转换。"
+  "ipv6Body": "加密 DNS 同时查询两种地址；IPv4 失败或卡住时尝试 IPv6，并记住成功地址。HTTP 和 SOCKS5 隧道支持 IPv6 目标，代理路由及证书校验仍然保留。仅支持 IPv4 的网站仍需要代理商提供地址转换。",
+  "startupVersion": "0.1.19 新功能",
+  "startupTitle": "打开网页不再等待环境启动",
+  "startupBody": "修复加密 DNS 自举失败及隧道连接错误。新标签页立即使用已有出口配置，首次地区查询只短暂等待；环境同步在后台进行。恢复守护进程延长启动限时并提供明确诊断，同时修复 Windows 环境恢复时的注册表读取冲突。 网站语言默认中文优先、英语其次，与出口时区独立，也可选择英语优先或跟随出口语言；Gemini 的冲突语言参数会自动纠正。"
 }
