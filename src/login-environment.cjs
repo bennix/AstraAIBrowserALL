@@ -60,7 +60,7 @@ function profileValues(profile,available,baseline,{disableToolTelemetry=false}={
 function quoteWindows(value){return '"'+String(value).replace(/(\\*)"/g,'$1$1\\"').replace(/(\\+)$/,'$1$1')+'"';}
 async function watchdog({file,token,recoveryDir,nodeExecutable}){
  const directory=recoveryDir||path.join(path.dirname(file),'recovery');fs.mkdirSync(directory,{recursive:true,mode:0o700});
- for(const name of ['login-environment.cjs','login-env-adapter.cjs','login-env-watchdog.cjs'])fs.writeFileSync(path.join(directory,name),fs.readFileSync(path.join(__dirname,name)),{mode:0o600});
+ for(const name of ['login-environment.cjs','login-env-adapter.cjs','login-env-watchdog.cjs','watchdog-ready.cjs'])fs.writeFileSync(path.join(directory,name),fs.readFileSync(path.join(__dirname,name)),{mode:0o600});
  const script=path.join(directory,'login-env-watchdog.cjs');
  write(path.join(directory,'recovery-target.json'),{file,token});
  let executable=nodeExecutable||process.execPath;
@@ -77,8 +77,8 @@ async function watchdog({file,token,recoveryDir,nodeExecutable}){
   const license=path.join(path.dirname(executable),'Node-LICENSE.txt');if(fs.existsSync(license))fs.copyFileSync(license,path.join(directory,'Node-LICENSE.txt'));
   executable=localRuntime;
  }
- const child=cp.spawn(executable,[script,file,token],{detached:true,windowsHide:true,env:{...process.env,ELECTRON_RUN_AS_NODE:'1'},stdio:['ignore','ignore','ignore','ipc']});
- await new Promise((resolve,reject)=>{const timer=setTimeout(()=>{child.kill();reject(Error('Environment recovery watchdog did not start'));},5000);child.once('error',e=>{clearTimeout(timer);reject(e);});child.once('message',message=>{clearTimeout(timer);if(message?.ready)resolve();else reject(Error('Environment recovery watchdog failed'));});child.once('exit',()=>{clearTimeout(timer);reject(Error('Environment recovery watchdog exited'));});});
+ const child=cp.spawn(executable,[script,file,token],{detached:true,windowsHide:true,env:{...process.env,ELECTRON_RUN_AS_NODE:'1'},stdio:['ignore','ignore','pipe','ipc']});
+ await require('./watchdog-ready.cjs')(child);
  child.disconnect();child.unref();
  const watchdogOwner=await identity(child.pid);
  if(process.platform!=='win32')return {command:null,owner:watchdogOwner};

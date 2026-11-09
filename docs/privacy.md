@@ -82,9 +82,10 @@ The encrypted DNS bridge queries both A and AAAA records, retains multiple usabl
 addresses and staggers connection attempts through the selected proxy. A rejected
 or blackholed IPv4 destination no longer prevents trying IPv6. SOCKS5 uses the
 numeric IPv4/IPv6 address types from RFC 1928; HTTP CONNECT brackets IPv6 literals.
-Plain HTTP IPv6 literals do not enter DNS resolution. Cloudflare DoH uses the
-official dual-stack `https://cloudflare-dns.com/dns-query` endpoint rather than a
-fixed IPv4 literal. DNS, TLS validation and configured proxy routing remain in
+Plain HTTP IPv6 literals do not enter DNS resolution. Cloudflare JSON queries use the official dual-stack
+`https://cloudflare-dns.com/dns-query` endpoint. Chromium resolver bootstrap uses
+both encrypted literal endpoints (`1.1.1.1` and `2606:4700:4700::1111`) to avoid
+requiring DNS to resolve its own DNS server. DNS, TLS validation and configured proxy routing remain in
 force; failed proxy attempts do not add an unconfigured direct fallback.
 
 Tests use local IPv6 proxy fixtures on macOS, Windows and Linux, including an
@@ -94,3 +95,14 @@ An IPv6-only exit still needs provider-side translation to reach IPv4-only sites
 
 References: https://www.rfc-editor.org/info/rfc1928/ and
 https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/make-api-requests/dns-json/
+
+### Navigation and background environment startup
+
+New tabs apply a cached exit-region profile immediately. Without a cached profile,
+region detection can delay initial navigation by at most 1.5 seconds; later lookup
+results update the locale in the background. Global login-environment startup is
+not part of the navigation dependency chain. Its recovery helper has a 20-second
+readiness deadline with bounded startup diagnostics; environment variables are
+only changed after the helper confirms readiness. Original five-second startup
+failures were not reproduced consistently; the installed signed runtime also has
+a real Electron-parent handshake probe.

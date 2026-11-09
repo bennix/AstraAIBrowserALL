@@ -11,7 +11,7 @@ async function applyProxy(preferences){
  }else if(mode==='system')config={mode:'system'};
  else if(mode==='direct')config={mode:'direct'};
  else throw Error('Invalid proxy mode');
- app.configureHostResolver({enableBuiltInResolver:true,secureDnsMode:preferences.secureDns===false?'off':'secure',secureDnsServers:preferences.secureDns===false?[]:[dns.wire]});
+ app.configureHostResolver({enableBuiltInResolver:true,secureDnsMode:preferences.secureDns===false?'off':'secure',secureDnsServers:preferences.secureDns===false?[]:[dns.wire,dns.wireV6].filter(Boolean)});
  const dnsSession=session.fromPartition('astra-secure-dns');await dnsSession.setProxy(config);await dnsSession.closeAllConnections();
  const nextBridge=preferences.secureDns===false?null:await require('./proxy-dns.cjs')(dnsSession,{provider:dns.id});
  const browserConfig=nextBridge?{mode:'fixed_servers',proxyRules:nextBridge.url,proxyBypassRules:'<-loopback>'}:config;

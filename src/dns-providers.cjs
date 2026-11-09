@@ -1,5 +1,5 @@
 const providers={
- cloudflare:{id:'cloudflare',label:'Cloudflare',wire:'https://cloudflare-dns.com/dns-query',json:'https://cloudflare-dns.com/dns-query'},
+ cloudflare:{id:'cloudflare',label:'Cloudflare',wire:'https://1.1.1.1/dns-query',wireV6:'https://[2606:4700:4700::1111]/dns-query',json:'https://cloudflare-dns.com/dns-query'},
  google:{id:'google',label:'Google Public DNS',wire:'https://dns.google/dns-query',json:'https://dns.google/resolve'}
 };
 function get(value='cloudflare'){if(!Object.hasOwn(providers,value))throw Error('Unknown encrypted DNS provider');return providers[value];}
