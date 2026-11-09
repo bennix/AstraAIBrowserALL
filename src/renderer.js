@@ -215,3 +215,6 @@ $('login-env-badge').onclick=async()=>{const badge=$('login-env-badge');if(badge
 // Show saved and running state separately until the browser is restarted.
 window.astra.onState(state=>{const button=$('fingerprint-toggle'),enabled=state.settings.strictPrivacy!==false,pending=enabled!==state.fingerprintActive;button.dataset.enabled=String(enabled);button.setAttribute('aria-pressed',String(enabled));button.textContent='指纹保护 '+(enabled?'开':'关')+(pending?' · 待重启':'');button.title=(enabled?'点击关闭严格指纹保护':'点击开启严格指纹保护')+'；重启后生效，不改变环境同步与指纹模式选择。';});
 $('fingerprint-toggle').onclick=async()=>{const button=$('fingerprint-toggle');if(button.disabled)return;button.disabled=true;try{await send('fingerprint-toggle',button.dataset.enabled!=='true');}catch(error){window.alert(error.message);}finally{button.disabled=false;}};
+
+window.astra.onState(state=>{if(document.activeElement!==$('website-language-mode'))$('website-language-mode').value=state.settings.websiteLanguageMode||'zh';});
+$('website-language-mode').onchange=async()=>{try{await send('website-language-mode',$('website-language-mode').value);}catch(error){window.alert(error.message);}};

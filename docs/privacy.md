@@ -106,3 +106,15 @@ readiness deadline with bounded startup diagnostics; environment variables are
 only changed after the helper confirms readiness. Original five-second startup
 failures were not reproduced consistently; the installed signed runtime also has
 a real Electron-parent handshake probe.
+
+### Website language priority
+
+Website language defaults to Chinese first, then English, independently of the
+exit timezone. Settings also provide English first or an explicit exit-language
+choice. Browser language headers, page/Worker locale and optional login-session
+locale use this preference. A preferred Chinese/English language is also applied
+to Gemini's main application `hl` query parameter; sign-in paths, other hosts,
+and the explicit exit-language choice are not rewritten. Other sites may still
+use their own account or cookie language setting. Preferring Chinese/English can
+differ from the exit country's majority language; this is an intentional user
+preference, not a claim to hide that difference.
