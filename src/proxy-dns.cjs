@@ -45,7 +45,7 @@ module.exports=async function createDnsBridge(upstream,{provider='cloudflare'}={
   }
   return socket;}catch(error){socket.destroy();throw error;}
  }
- async function destination(url,host,port){return connectCandidates(await resolve(host),(ip,signal)=>tunnel(url,ip,port,signal));}
+ async function destination(url,host,port){return connectCandidates(await resolve(host),(ip,signal)=>tunnel(url,ip,port,signal),{onConnect:ip=>{const entry=cache.get(unbracket(host));if(entry)entry.addresses=[ip,...entry.addresses.filter(value=>value!==ip)];}});}
  const server=http.createServer(async(req,res)=>{
   let remote;try{
    const url=new URL(req.url);if(url.protocol!=='http:')throw Error('Unsupported proxy request');

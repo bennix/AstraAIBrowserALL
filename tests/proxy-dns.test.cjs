@@ -34,3 +34,5 @@ test('plain HTTP IPv6 literal bypasses DNS while preserving the bracketed Host h
  const server=http.createServer((req,res)=>res.end(req.headers.host)),port=await listen(server);const b=await bridge({resolveProxy:async()=> 'DIRECT',fetch:async()=>{throw Error('Unexpected DNS');}});t.after(async()=>{await b.close();await new Promise(r=>server.close(r));});
  const body=await new Promise((resolve,reject)=>{http.get(b.url+'/ignored',{path:`http://[::1]:${port}/test`},res=>{let text='';res.on('data',chunk=>text+=chunk);res.on('end',()=>resolve(text));}).on('error',reject);});assert.equal(body,`[::1]:${port}`);
 });
+
+test('successful IPv6 address is preferred for subsequent connections within DNS TTL',async t=>{const f=await fixture(t);assert.match(await requestTunnel(f.b.url),/ECHO_TEST/);assert.match(await requestTunnel(f.b.url),/ECHO_TEST/);assert.deepEqual(f.types,[1,4,4]);assert.equal(f.queries.length,2);});
