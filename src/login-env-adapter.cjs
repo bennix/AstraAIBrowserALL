@@ -15,11 +15,20 @@ if(!$key -and $p.op -ne 'read'){$key=$reg.CreateSubKey($path)}
 if($p.op -eq 'read'){
  $out=@{}
  foreach($name in $p.keys){
-  if($key -and $key.GetValueNames() -contains $name){
-   $kind=[int]$key.GetValueKind($name)
-   if($kind -notin @(1,2)){throw 'Unsupported registry environment value type'}
-   $out[$name]=@{present=$true;value=[string]$key.GetValue($name,$null,[Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames);kind=$kind}
-  }else{$out[$name]=@{present=$false}}
+  for($attempt=0;$attempt -lt 5;$attempt++){
+   try{
+    $value=if($key){$key.GetValue($name,$null,[Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)}else{$null}
+    if($null -ne $value){
+     $kind=[int]$key.GetValueKind($name)
+     if($kind -notin @(1,2)){throw 'Unsupported registry environment value type'}
+     $out[$name]=@{present=$true;value=[string]$value;kind=$kind}
+    }else{$out[$name]=@{present=$false}}
+    break
+   }catch{
+    if($attempt -lt 4 -and ($_.Exception -is [IO.IOException] -or $_.Exception.InnerException -is [IO.IOException])){Start-Sleep -Milliseconds 20;continue}
+    throw
+   }
+  }
  }
  $out|ConvertTo-Json -Compress -Depth 6
 }elseif($p.op -eq 'write'){
